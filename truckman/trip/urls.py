@@ -11,4 +11,12 @@ urlpatterns = [
     path('list_vehicles', views.list_vehicles, name='list_vehicles'),
     #--ends
 
+    #driver urls
+    path('add_driver', views.add_driver, name='add_driver'),
+    path('update_driver/<str:pk>', views.update_driver, name='update_driver'),
+    path('remove_driver/<str:pk>', views.remove_driver, name='remove_driver'),
+    path('view_driver/<str:pk>', views.view_driver, name='view_driver'),
+    path('list_drivers', views.list_drivers, name='list_drivers'),
+    #--ends
+
 ]
