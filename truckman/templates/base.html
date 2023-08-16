@@ -25,6 +25,15 @@
             <div class="nk-wrap ">
                 <!-- sidebar-->
                 {% include 'main-header.html' %}
+
+                <!-- displaying flash messages -->
+                {% if messages %}
+                <ul class="alert alert-icon alert-primary" id="msg">
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
  
                 {% block content %}
 
