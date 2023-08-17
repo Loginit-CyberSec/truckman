@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import transaction
 from authentication.forms import Client
 
 #---------------------------------- Vehicle models ------------------------------------------
@@ -76,12 +77,52 @@ class Driver(models.Model):
 
     def __str__(self):
         return self.first_name + self.last_name
-'''
 
-# Create your models here.
+#---------------------------------- Customer Modules ------------------------------------------
+
+PAYMENT_TERM = (
+    ('2 DAYS','2 Days'),
+    ('7 DAYS','7 Days'),
+    ('10 DAYS','10 Days'),
+    ('15 DAYS','15 Days'),
+    ('30 DAYS','30 Days'),
+    ('Cash on Delivery','Cash on Delivery'),
+) 
 class Customer(models.Model):
-    pass
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    customer_id = models.CharField(max_length=7, unique=True, editable=False)
+    name = models.CharField(max_length=50)
+    contact_person = models.CharField(max_length=50, null=True, blank=True)
+    phone = models.CharField(max_length=13, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    address_one = models.CharField(max_length=50, null=True, blank=True)
+    address_two = models.CharField(max_length=50, null=True, blank=True)
+    country = models.CharField(max_length=50, null=True, blank=True)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+    payment_term = models.CharField(max_length=50, choices=PAYMENT_TERM, default='2 DAYS')
+    credit_limit = models.IntegerField(null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    logo = models.ImageField(upload_to='customer_logo/', null=True, blank=True)
 
+    #generate customer_id 
+    def save(self, *args, **kwargs):
+        if not self.customer_id:
+            prefix = 'CU'
+            # Averting race condition using 'select_for_update()'
+            with transaction.atomic():
+                last_customer = Customer.objects.select_for_update().filter(customer_id__startswith=prefix).order_by('-customer_id').first()
+                if last_customer:
+                    last_id = last_customer.customer_id[2:]  # Remove prefix
+                    next_id = str(int(last_id) + 1).zfill(4)
+                    self.customer_id = prefix + next_id
+                else:
+                    self.customer_id = prefix + '0001'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+'''
 # Create your models here.
 class Consignee(models.Model):
     pass

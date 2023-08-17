@@ -42,3 +42,4 @@ class CustomUser(AbstractUser):
         related_query_name='custom_user',
     )
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver
-from .forms import VehicleForm, DriverForm
+from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer
+from .forms import VehicleForm, DriverForm, CustomerForm
 from truckman.utils import get_user_company
 
 
@@ -230,3 +230,110 @@ def remove_driver(request, pk):
 #--ends
 
 #---------------------------------- Customer views------------------------------------------
+
+# add customer
+def add_customer(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = CustomerForm(request.POST) 
+    if request.method == 'POST':
+        #create instance of a customer
+        customer = Customer.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            contact_person = request.POST.get('contact_person'),
+            phone = request.POST.get('phone'),
+            email = request.POST.get('email'),
+            address_one = request.POST.get('address_one'),
+            address_two = request.POST.get('address_two'),
+            country = request.POST.get('country'),
+            city = request.POST.get('city'),
+            website = request.POST.get('website'),
+            credit_limit = request.POST.get('credit_limit'),
+            payment_term = request.POST.get('payment_term'),
+            logo = request.FILES.get('logo'),
+        )
+
+        messages.success(request, f'Customer was added successfully.')
+        return redirect('list_customers')
+
+    context= {'form':form}
+    return render(request, 'trip/customer/add-customer.html', context)
+#--ends
+
+# update customer
+def update_customer(request, pk):
+    company = get_user_company(request) #get request user company
+    customer = Customer.objects.get(id=pk, company=company)
+    if request.method == 'POST':
+        #update instance 
+        customer.company=company
+        customer.name = request.POST.get('name')
+        customer.contact_person = request.POST.get('contact_person')
+        customer.phone = request.POST.get('phone')
+        customer.email = request.POST.get('email')
+        customer.address_one = request.POST.get('address_one')
+        customer.address_two = request.POST.get('address_two')
+        customer.country = request.POST.get('country')
+        customer.city = request.POST.get('city')
+        customer.website = request.POST.get('website')
+        customer.credit_limit = request.POST.get('credit_limit')
+        customer.payment_term = request.POST.get('payment_term')
+        customer.logo = request.FILES.get('logo')
+        customer.save()
+        
+        messages.success(request, f'Customer details edited successfully.')
+        return redirect('list_customers')
+    else:
+        # prepopulate the form with existing data
+        form_data = {
+            'name': customer.name,
+            'contact_person': customer.contact_person,
+            'phone': customer.phone,
+            'email': customer.email,
+            'address_one': customer.address_one,
+            'address_two': customer.address_two,
+            'country': customer.country,
+            'city': customer.city,
+            'website': customer.website,
+            'credit_limit': customer.credit_limit,
+            'payment_term': customer.payment_term,
+            'logo': customer.logo,
+        }
+
+        form = CustomerForm(initial=form_data)
+        context = {
+            'customer':customer,
+            'form':form
+        }
+        return render(request,'trip/customer/update-customer.html', context)
+#--ends
+
+#customers list
+def list_customers(request):
+    customers = Customer.objects.filter(company=get_user_company(request))
+    number_of_customers = customers.count()
+    context = {
+        'customers':customers,
+        'number_of_customers':number_of_customers
+    }
+    return render(request, 'trip/customer/customers-list.html', context)
+#--ends
+
+#view customer
+def view_customer(request, pk):
+    customer = Customer.objects.get(id=pk, company=get_user_company(request))
+    context={'customer':customer}
+    return render(request, 'trip/customer/view-customer.html', context)
+#--ends
+
+# remove customer
+def remove_customer(request, pk):
+    if request.method == 'POST':
+        customer = Customer.objects.get(id=pk, company=get_user_company(request))
+        customer.delete()
+        messages.success(request, f'Customer {customer.first_name} removed')
+        return redirect('list_customers')
+#--ends
+
+#---------------------------------- Consignee views------------------------------------------

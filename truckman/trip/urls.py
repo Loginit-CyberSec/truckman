@@ -19,4 +19,12 @@ urlpatterns = [
     path('list_drivers', views.list_drivers, name='list_drivers'),
     #--ends
 
+    #Customer urls
+    path('add_customer', views.add_customer, name='add_customer'),
+    path('update_customer/<str:pk>', views.update_customer, name='update_customer'),
+    path('remove_customer/<str:pk>', views.remove_customer, name='remove_customer'),
+    path('view_customer/<str:pk>', views.view_customer, name='view_customer'),
+    path('list_customers', views.list_customers, name='list_customers'),
+    #--ends
+
 ]
