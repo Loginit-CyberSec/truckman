@@ -80,8 +80,8 @@
                                     <span>AB</span>
                                 </div>
                                 <div class="user-info">
-                                    <span class="lead-text">Abu Bin Ishtiyak</span>
-                                    <span class="sub-text text-soft">info@softnio.com</span>
+                                    <span class="lead-text">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                                    <span class="sub-text text-soft">{{ request.user.email }}</span>
                                 </div>
                             </div>
                         </div>
@@ -94,7 +94,7 @@
                         </div>
                         <div class="dropdown-inner">
                             <ul class="link-list">
-                                <li><a href="#"><em class="icon ni ni-signout"></em><span>Sign out</span></a></li>
+                                <li><a href="{% url 'logout' %}"><em class="icon ni ni-signout"></em><span>Sign out</span></a></li>
                             </ul>
                         </div>
                     </div>
@@ -120,13 +120,10 @@
                         </a>
                         <ul class="nk-menu-sub">
                             <li class="nk-menu-item">
-                                <a href="html/pharmacy/add-customer.html" class="nk-menu-link"><span class="nk-menu-text">Add Customer</span></a>
+                                <a href="{% url 'add_customer' %}" class="nk-menu-link"><span class="nk-menu-text">Add Customer</span></a>
                             </li>
                             <li class="nk-menu-item">
-                                <a href="html/pharmacy/customer.html" class="nk-menu-link"><span class="nk-menu-text">Customer List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/pharmacy/customer-ledger.html" class="nk-menu-link"><span class="nk-menu-text">Customer Ledger</span></a>
+                                <a href="{% url 'list_customers' %}" class="nk-menu-link"><span class="nk-menu-text">Customer List</span></a>
                             </li>
                         </ul><!-- .nk-menu-sub -->
                     </li><!-- .nk-menu-item -->

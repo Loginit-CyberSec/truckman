@@ -1,5 +1,5 @@
 from django import forms
-from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver
+from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer
 
 
 #---------------------------------- Vehicle forms ------------------------------------------
@@ -63,5 +63,33 @@ class DriverForm(forms.ModelForm):
                 'assigned_vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
             } 
         
-#---------------------------------- Customer forms ------------------------------------------      
-       
+#---------------------------------- Customer forms ------------------------------------------   
+class CustomerForm(forms.ModelForm):
+    '''
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(CustomerForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_vehicle'].queryset = Customer.objects.filter(company=company) 
+    '''
+    class Meta:
+        model = Customer
+        fields = '__all__'
+        exclude =['company', 'customer_id', 'date_added']
+
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John Shippers'}),
+                'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Iteo'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'034567800'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@company.com'}),
+                'address_one': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
+                'address_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
+                'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'KENYA'}),
+                'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'MOMBASA'}),
+                'website': forms.URLInput(attrs={'class': 'form-control', 'placeholder':'www.company.com'}),
+                'credit_limit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'20'}),
+                'payment_term': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'logo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+            }    
+#---------------------------------- Consignee forms ------------------------------------------ 
+
+
