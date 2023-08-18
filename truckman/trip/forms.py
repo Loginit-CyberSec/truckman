@@ -1,5 +1,5 @@
 from django import forms
-from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer
+from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Shipper, Consignee, Load, Trip
 
 
 #---------------------------------- Vehicle forms ------------------------------------------
@@ -90,6 +90,124 @@ class CustomerForm(forms.ModelForm):
                 'payment_term': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'logo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
             }    
+
 #---------------------------------- Consignee forms ------------------------------------------ 
+class ConsigneeForm(forms.ModelForm):
+    '''
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(CustomerForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_vehicle'].queryset = Customer.objects.filter(company=company) 
+    '''
+    class Meta:
+        model = Consignee
+        fields = '__all__'
+        exclude =['company', 'consignee_id', 'date_added']
 
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John Shippers'}),
+                'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Iteo'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'034567800'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@company.com'}),
+                'address_one': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
+                'address_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
+                'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'KENYA'}),
+                'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'MOMBASA'}),
+                'website': forms.URLInput(attrs={'class': 'form-control', 'placeholder':'https://company.com'}),
+                'logo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+            }    
+        
+#---------------------------------- Shipper forms ------------------------------------------ 
+class ShipperForm(forms.ModelForm):
+    '''
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(CustomerForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_vehicle'].queryset = Customer.objects.filter(company=company) 
+    '''
+    class Meta:
+        model = Shipper
+        fields = '__all__'
+        exclude =['company', 'shipper_id', 'date_added']
 
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'John Shippers'}),
+                'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Moriasi Iteo'}),
+                'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'034567800'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@company.com'}),
+                'address_one': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
+                'address_two': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ABC Road'}),
+                'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'KENYA'}),
+                'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'MOMBASA'}),
+                'website': forms.URLInput(attrs={'class': 'form-control', 'placeholder':'https://company.com'}),
+                'logo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+            }    
+
+#---------------------------------- Load forms -----------------------------------------------
+
+class LoadForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(LoadForm, self).__init__(*args, **kwargs)
+        self.fields['customer'].queryset = Customer.objects.filter(company=company) 
+        self.fields['shipper'].queryset = Shipper.objects.filter(company=company) 
+        self.fields['consignee'].queryset = Consignee.objects.filter(company=company) 
+    
+    class Meta:
+        model = Load
+        fields = '__all__'
+        exclude =['company', 'load_id', 'date_added']
+
+        widgets = {
+                'customer': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'shipper': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'consignee': forms.Select(attrs={'class': 'form-select js-select2'}),
+                #load details
+                'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800, weigh in Tons'}),
+                'pickup_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
+                'delivery_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
+                'quantity':forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'quantity_type':forms.Select(attrs={'class': 'form-select js-select2'}),
+                'commodity':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Maize Flour'}),
+                'driver_instructions':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Fragile load, Drive with caution!'}),
+                #charges and fees
+                'primary_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'primary_fee_type': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'fuel_surcharge_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'fsc_amount_type': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'border_agent_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'road_user': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'gate_tolls': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'fines': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'additional_fees': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                'invoice_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #others
+                'legal_disclaimer': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some legal dissclaimer...'}),
+                'notes': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some notes/description about the load..'})
+            }    
+
+#---------------------------------- Trip forms -----------------------------------------------
+class TripForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(TripForm, self).__init__(*args, **kwargs)
+        self.fields['load'].queryset = Load.objects.filter(company=company) 
+        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company)
+        self.fields['driver'].queryset = Driver.objects.filter(company=company)  
+    
+    class Meta:
+        model = Trip
+        fields = '__all__'
+        exclude =['company', 'trip_id', 'date_added']
+
+        widgets = {
+                'load': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
+                'driver': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'driver_accesory_pay': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
+                'driver_advance': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'600'}), 
+        }
+#---------------------------------- Trip forms -----------------------------------------------
