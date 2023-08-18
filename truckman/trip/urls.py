@@ -27,4 +27,36 @@ urlpatterns = [
     path('list_customers', views.list_customers, name='list_customers'),
     #--ends
 
+    #shipper urls
+    path('add_shipper', views.add_shipper, name='add_shipper'),
+    path('update_shipper/<str:pk>', views.update_shipper, name='update_shipper'),
+    path('remove_shipper/<str:pk>', views.remove_shipper, name='remove_shipper'),
+    path('view_shipper/<str:pk>', views.view_shipper, name='view_shipper'),
+    path('list_shippers', views.list_shippers, name='list_shippers'),
+    #--ends
+
+    #Consignee urls
+    path('add_consignee', views.add_consignee, name='add_consignee'),
+    path('update_consignee/<str:pk>', views.update_consignee, name='update_consignee'),
+    path('remove_consignee/<str:pk>', views.remove_consignee, name='remove_consignee'),
+    path('view_consignee/<str:pk>', views.view_consignee, name='view_consignee'),
+    path('list_consignees', views.list_consignees, name='list_consignees'),
+    #--ends
+
+    #load urls
+    path('add_load', views.add_load, name='add_load'),
+    path('update_load/<str:pk>', views.update_load, name='update_load'),
+    path('remove_load/<str:pk>', views.remove_load, name='remove_load'),
+    path('view_load/<str:pk>', views.view_load, name='view_load'),
+    path('list_loads', views.list_loads, name='list_loads'),
+    #--ends
+
+    #trip urls
+    path('add_trip', views.add_trip, name='add_trip'),
+    path('update_trip/<str:pk>', views.update_trip, name='update_trip'),
+    path('remove_trip/<str:pk>', views.remove_trip, name='remove_trip'),
+    path('view_trip/<str:pk>', views.view_trip, name='view_trip'),
+    path('list_trips', views.list_trips, name='list_trips'),
+    #--ends
+
 ]
