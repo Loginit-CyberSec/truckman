@@ -1,12 +1,58 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Consignee, Shipper, Load, Trip
-from .forms import VehicleForm, DriverForm, CustomerForm, ConsigneeForm, ShipperForm, LoadForm, TripForm
+from .forms import VehicleMakeForm, VehicleModelForm, VehicleForm, DriverForm, CustomerForm, ConsigneeForm, ShipperForm, LoadForm, TripForm
 from truckman.utils import get_user_company
 
 
-#---------------------------------- Vehicle Views------------------------------------------
 
+
+#---------------------------------- Vehicle Make Views------------------------------------------
+# add vehicle make
+def add_vehicle_make(request):
+    company = get_user_company(request) #get request user company
+    #instantiate the two kwargs to be able to access them on the forms.py
+    #form = VehicleMakeForm(request.POST, company=company) 
+    if request.method == 'POST':
+        #create instance of vehicle make
+        vehicle_make = Vehicle_Make.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+        )
+
+        messages.success(request, f' {vehicle_make.name} was added successfully.')
+        return redirect('add_vehicle')
+
+    #redirect
+    #context= {'form':form}
+    return render(request, 'trip/vehicle-make/add-vehicle-make.html')
+#--ends
+
+#---------------------------------- Vehicle Model Views------------------------------------------
+# add vehicle model
+def add_vehicle_model(request):
+    company = get_user_company(request) #get request user company
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = VehicleModelForm(request.POST, company=company) 
+    if request.method == 'POST':
+        make_id = request.POST.get('make')
+        make = Vehicle_Make.objects.get(id=make_id)
+        #create instance of vehicle make
+        vehicle_model = Vehicle_Model.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            make=make
+        )
+
+        messages.success(request, f' {vehicle_model.name} was added successfully.')
+        return redirect('add_vehicle')
+
+    #redirect
+    context= {'form':form}
+    return render(request, 'trip/vehicle-model/add-vehicle-model.html', context)
+#--ends
+
+#---------------------------------- Vehicle Views------------------------------------------
 # add vehicle
 def add_vehicle(request):
     company = get_user_company(request) #get request user company
