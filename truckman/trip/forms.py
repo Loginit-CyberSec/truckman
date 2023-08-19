@@ -2,11 +2,50 @@ from django import forms
 from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Shipper, Consignee, Load, Trip
 
 
+#---------------------------------- Vehicle Make forms ------------------------------------------
+class VehicleMakeForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        '''
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(VehicleMakeForm, self).__init__(*args, **kwargs)
+        self.fields['make'].queryset = Vehicle_Make.objects.filter(company=company)
+        self.fields['model'].queryset = Vehicle_Model.objects.filter(company=company)
+        '''
+    class Meta:
+        model = Vehicle_Make
+        fields = '__all__'
+        exclude =['company']
+
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Mercedes'}),
+            } 
+
+#---------------------------------- Vehicle model forms ------------------------------------------
+class VehicleModelForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(VehicleModelForm, self).__init__(*args, **kwargs)
+        self.fields['make'].queryset = Vehicle_Make.objects.filter(company=company)
+        
+    class Meta:
+        model = Vehicle_Model
+        fields = '__all__'
+        exclude =['company']
+
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Mercedes'}),
+                'make': forms.Select(attrs={'class': 'form-select js-select2'}),
+            } 
+
 #---------------------------------- Vehicle forms ------------------------------------------
 class VehicleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')# Get the company from kwargs
+       # make = kwargs.pop('make')
         super(VehicleForm, self).__init__(*args, **kwargs)
         self.fields['make'].queryset = Vehicle_Make.objects.filter(company=company)
         self.fields['model'].queryset = Vehicle_Model.objects.filter(company=company)

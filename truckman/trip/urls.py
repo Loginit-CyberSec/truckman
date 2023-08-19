@@ -3,6 +3,17 @@ from . import views
  
 
 urlpatterns = [
+
+    #vehicle make urls
+    path('add_vehicle_make', views.add_vehicle_make, name='add_vehicle_make'),
+    
+    #--ends
+
+    #vehicle model urls
+    path('add_vehicle_model', views.add_vehicle_model, name='add_vehicle_model'),
+    
+    #--ends
+
     #vehicle urls
     path('add_vehicle', views.add_vehicle, name='add_vehicle'),
     path('update_vehicle/<str:pk>', views.update_vehicle, name='update_vehicle'),
