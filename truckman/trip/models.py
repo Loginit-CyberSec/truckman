@@ -41,7 +41,7 @@ class Vehicle(models.Model):
     vin = models.CharField(max_length=20, unique=True)
     make = models.ForeignKey(Vehicle_Make, on_delete=models.SET_NULL, null=True)
     model = models.ForeignKey(Vehicle_Model, on_delete=models.SET_NULL, null=True)
-    color = models.CharField(null=True, blank=True)
+    color = models.CharField(max_length=50, null=True, blank=True)
     milage_unit = models.CharField(max_length=10, choices=MILAGE_CHOICES, default='kilometers')
     milage = models.PositiveIntegerField(null=True, blank=True)
     insurance_expiry = models.DateField(null=True)
