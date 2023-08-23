@@ -31,7 +31,7 @@
                             </li>
                             <li class="nk-menu-item">
                                 <a href="#" class="nk-menu-link nk-menu-switch" data-target="navPages">
-                                    <span class="nk-menu-icon"><em class="icon ni ni-files"></em></span>
+                                    <span class="nk-menu-icon"><em class="icon ni ni-coins"></em></span>
                                 </a>
                             </li>
                             <li class="nk-menu-item">
@@ -109,38 +109,16 @@
                         </a>
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                        <a href="{% url 'list_drivers' %}" class="nk-menu-link ">
                             <span class="nk-menu-icon"><em class="icon ni ni-speed"></em></span>
                             <span class="nk-menu-text">Driver</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_driver' %}" class="nk-menu-link"><span class="nk-menu-text">Add Driver</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'list_drivers' %}" class="nk-menu-link"><span class="nk-menu-text">Drivers List</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                        <a href="{% url 'list_vehicles' %}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-truck"></em></span>
                             <span class="nk-menu-text">Vehicle</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_vehicle' %}" class="nk-menu-link"><span class="nk-menu-text">Add Vehicle</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'list_vehicles' %}" class="nk-menu-link"><span class="nk-menu-text">Vehicle List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_vehicle_make' %}" class="nk-menu-link"><span class="nk-menu-text">Add Vehicle Make (brand)</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_vehicle_model' %}" class="nk-menu-link"><span class="nk-menu-text">Add Vehicle Model</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
                         <a href="#" class="nk-menu-link nk-menu-toggle">
@@ -238,38 +216,17 @@
                 <h5 class="title">Operations</h5>
                 <ul class="nk-menu">
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                        <a href="{% url 'list_drivers' %}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-capsule-fill"></em></span>
                             <span class="nk-menu-text">Driver</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_driver' %}" class="nk-menu-link"><span class="nk-menu-text">Add Driver</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'list_drivers' %}" class="nk-menu-link"><span class="nk-menu-text">Drivers List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_vehicle_make' %}" class="nk-menu-link"><span class="nk-menu-text">Add Vehicle Make (brand)</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_vehicle_model' %}" class="nk-menu-link"><span class="nk-menu-text">Add Vehicle Model</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                        <a href="{% url 'list_vehicles' %}" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-truck"></em></span>
                             <span class="nk-menu-text">Vehicle</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="{% url 'add_vehicle' %}" class="nk-menu-link"><span class="nk-menu-text">Add Vehicle</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="{% url 'list_vehicles' %}" class="nk-menu-link"><span class="nk-menu-text">Vehicle List</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
+
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
                         <a href="#" class="nk-menu-link nk-menu-toggle">
@@ -348,138 +305,33 @@
                 <h5 class="title">Finance</h5>
                 <ul class="nk-menu">
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                            <span class="nk-menu-icon"><em class="icon ni ni-tile-thumb-fill"></em></span>
-                            <span class="nk-menu-text">Projects</span>
+                        <a href="{% url 'list_payments' %}" class="nk-menu-link ">
+                            <span class="nk-menu-icon"><em class="icon ni ni-sign-usdc-alt"></em></span>
+                            <span class="nk-menu-text">Payments</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="html/project-card.html" class="nk-menu-link"><span class="nk-menu-text">Project Cards</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/project-list.html" class="nk-menu-link"><span class="nk-menu-text">Project List</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                            <span class="nk-menu-icon"><em class="icon ni ni-users-fill"></em></span>
-                            <span class="nk-menu-text">User Manage</span>
+                        <a href="{% url 'list_expenses' %}" class="nk-menu-link">
+                            <span class="nk-menu-icon"><em class="icon ni ni-wallet-out"></em></span>
+                            <span class="nk-menu-text">Expenses</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="html/user-list-regular.html" class="nk-menu-link"><span class="nk-menu-text">User List - Regular</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/user-list-compact.html" class="nk-menu-link"><span class="nk-menu-text">User List - Compact</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/user-details-regular.html" class="nk-menu-link"><span class="nk-menu-text">User Details - Regular</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/user-profile-regular.html" class="nk-menu-link"><span class="nk-menu-text">User Profile - Regular</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/user-card.html" class="nk-menu-link"><span class="nk-menu-text">User Contact - Card</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
+                        
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                            <span class="nk-menu-icon"><em class="icon ni ni-user-list-fill"></em></span>
-                            <span class="nk-menu-text">Customers</span><span class="nk-menu-badge">New</span>
+                        <a href="{% url 'list_invoices' %}" class="nk-menu-link">
+                            <span class="nk-menu-icon"><em class="icon ni ni-report-profit"></em></span>
+                            <span class="nk-menu-text">Invoices</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="html/customer-list.html" class="nk-menu-link"><span class="nk-menu-text">Customer List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/customer-details.html" class="nk-menu-link"><span class="nk-menu-text">Customer Details</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
+                        
                     </li><!-- .nk-menu-item -->
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                            <span class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span>
-                            <span class="nk-menu-text">Ecommerce Pages</span>
+                        <a href="{% url 'list_estimates' %}" class="nk-menu-link">
+                            <span class="nk-menu-icon"><em class="icon ni ni-reports"></em></span>
+                            <span class="nk-menu-text">Estimates</span><span class="nk-menu-badge">New</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="html/products.html" class="nk-menu-link"><span class="nk-menu-text">Product List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/orders-regular.html" class="nk-menu-link"><span class="nk-menu-text">Order List - Regular</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/orders-sales.html" class="nk-menu-link"><span class="nk-menu-text">Order List - Sales</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/invoice-list.html" class="nk-menu-link"><span class="nk-menu-text">Invoices List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/invoice-details.html" class="nk-menu-link"><span class="nk-menu-text">Invoice Details</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
+                        
                     </li><!-- .nk-menu-item -->
-                    <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                            <span class="nk-menu-icon"><em class="icon ni ni-list-fill"></em></span>
-                            <span class="nk-menu-text">Products</span>
-                        </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="html/product-list.html" class="nk-menu-link"><span class="nk-menu-text">Product List</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/product-card.html" class="nk-menu-link"><span class="nk-menu-text">Product Card</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/product-details.html" class="nk-menu-link"><span class="nk-menu-text">Product Details</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
-                    </li><!-- .nk-menu-item -->
-                    <li class="nk-menu-item">
-                        <a href="html/pricing-table.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-view-col-fill"></em></span>
-                            <span class="nk-menu-text">Pricing Table</span>
-                        </a>
-                    </li><!-- .nk-menu-item -->
-                    <li class="nk-menu-item">
-                        <a href="html/gallery.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-img-fill"></em></span>
-                            <span class="nk-menu-text">Image Gallery</span>
-                        </a>
-                    </li><!-- .nk-menu-item -->
-                    <li class="nk-menu-item">
-                        <a href="html/_blank.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-file-fill"></em></span>
-                            <span class="nk-menu-text">Blank / Startup</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/pages/faqs.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-file-fill"></em></span>
-                            <span class="nk-menu-text">Faqs / Help</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/pages/terms-policy.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-file-fill"></em></span>
-                            <span class="nk-menu-text">Terms / Policy</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/pages/regular-v1.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-file-fill"></em></span>
-                            <span class="nk-menu-text">Regular Page - v1</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/pages/regular-v2.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-file-fill"></em></span>
-                            <span class="nk-menu-text">Regular Page - v2</span>
-                        </a>
-                    </li>
+                    
                 </ul><!-- .nk-menu -->
             </div>
             <div class="nk-menu-content" data-content="navMisc">
@@ -553,6 +405,12 @@
             <div class="nk-menu-content" data-content="navApps">
                 <h5 class="title">Apps</h5>
                 <ul class="nk-menu">
+                    <li class="nk-menu-item">
+                        <a href="{% url 'list_reminders' %}" class="nk-menu-link">
+                            <span class="nk-menu-icon"><em class="icon ni ni-bell"></em></span>
+                            <span class="nk-menu-text">Reminder</span>
+                        </a>
+                    </li>
                     <li class="nk-menu-item">
                         <a href="html/apps-inbox.html" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-inbox-fill"></em></span>

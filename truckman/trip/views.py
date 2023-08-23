@@ -1,8 +1,43 @@
 from django.shortcuts import render, redirect
+from django.utils import timezone
+from datetime import datetime
 from django.contrib import messages
 from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Consignee, Shipper, Load, Trip
-from .forms import VehicleMakeForm, VehicleModelForm, VehicleForm, DriverForm, CustomerForm, ConsigneeForm, ShipperForm, LoadForm, TripForm
+
+from . models import (
+    Vehicle, 
+    Vehicle_Make, 
+    Vehicle_Model, 
+    Driver, Customer, 
+    Consignee, 
+    Shipper, 
+    Load, 
+    Trip,
+    Expense,
+    Payment,
+    Invoice,
+    Expense_Category,
+    Reminder
+)
+
+from .forms import (
+    VehicleMakeForm,
+    VehicleModelForm,
+    VehicleForm, 
+    DriverForm, 
+    CustomerForm, 
+    ConsigneeForm, 
+    ShipperForm, 
+    LoadForm, 
+    TripForm,
+    ExpenseForm,
+    PaymentForm, 
+    ExpenseCategoryForm,
+    ReminderForm
+)
+
 from truckman.utils import get_user_company
+
 
 
 
@@ -58,6 +93,8 @@ def add_vehicle(request):
     company = get_user_company(request) #get request user company
     #instantiate the two kwargs to be able to access them on the forms.py
     form = VehicleForm(request.POST, company=company) 
+    vehicle_form = VehicleMakeForm(request.POST)
+    vehicle_model_form = VehicleModelForm(request.POST, company=company)
     if request.method == 'POST':
         #get post data
         make_id = request.POST.get('make')
@@ -74,20 +111,27 @@ def add_vehicle(request):
             make=make,
             model=model,
             milage=request.POST.get('milage'),
+            color=request.POST.get('color'),
             milage_unit = request.POST.get('milage_unit'),
             insurance_expiry = request.POST.get('insurance_expiry'),
             manufacture_year = request.POST.get('manufacture_year'),
             purchase_year = request.POST.get('purchase_year'),
             condition = request.POST.get('condition'),
-            image = request.FILES.get('image'),
             notes = request.POST.get('notes'),
+            truck_image = request.FILES.get('truck_image'),
+            trailer_image = request.FILES.get('trailer_image'),
+            truck_logbook = request.FILES.get('truck_logbook'),
+            trailer_logbook = request.FILES.get('trailer_logbook'),
+            good_transit_licence = request.FILES.get('good_transit_licence'),
         )
 
         messages.success(request, f'Vehicle {vehicle.plate_number} was added successfully.')
         return redirect('list_vehicles')
-
-    #redirect
-    context= {'form':form}
+    context= {
+        'form':form,
+        'vehicle_form':vehicle_form,
+        'vehicle_model_form':vehicle_model_form
+        }
     return render(request, 'trip/vehicle/add-vehicle.html', context)
 #--ends
 
@@ -112,13 +156,18 @@ def update_vehicle(request, pk):
         vehicle.make=make
         vehicle.model=model
         vehicle.milage=request.POST.get('milage')
+        vehicle.color=request.POST.get('color')
         vehicle.milage_unit = request.POST.get('milage_unit')
         vehicle.insurance_expiry = request.POST.get('insurance_expiry')
         vehicle.manufacture_year = request.POST.get('manufacture_year')
         vehicle.purchase_year = request.POST.get('purchase_year')
         vehicle.condition = request.POST.get('condition')
-        vehicle.image = request.FILES.get('image')
         vehicle.notes = request.POST.get('notes')
+        vehicle.truck_image = request.FILES.get('truck_image')
+        vehicle.trailer_image = request.FILES.get('trailer_image')
+        vehicle.truck_logbook = request.FILES.get('truck_logbook')
+        vehicle.trailer_logbook = request.FILES.get('trailer_logbook')
+        vehicle.good_transit_licence = request.FILES.get('good_transit_licence')
         vehicle.save()
         
         messages.success(request, f'Vehicle {vehicle.plate_number} was edited successfully.')
@@ -137,8 +186,12 @@ def update_vehicle(request, pk):
             'manufacture_year': vehicle.manufacture_year,
             'purchase_year': vehicle.purchase_year,
             'condition': vehicle.condition,
-            'image': vehicle.image,
-            'notes': vehicle.notes
+            'notes': vehicle.notes,
+            'truck_image': vehicle.truck_image,
+            'trailer_image': vehicle.trailer_image,
+            'truck_logbook': vehicle.truck_logbook,
+            'trailer_logbook': vehicle.trailer_logbook,
+            'good_transit_licence': vehicle.good_transit_licence,
         }
 
         form = VehicleForm(initial=form_data, company=company )
@@ -176,21 +229,34 @@ def add_driver(request):
     #instantiate the two kwargs to be able to access them on the forms.py
     form = DriverForm(request.POST, company=company) 
     if request.method == 'POST':
+        assigned_driver_id  = request.POST.get('assigned_vehicle')
+        assigned_vehicle = Vehicle.objects.get(id=assigned_driver_id, company=get_user_company(request))
+
         #create instance of a driver
         driver = Driver.objects.create(
+            #personal data
             company=company,
             first_name = request.POST.get('first_name'),
             last_name = request.POST.get('last_name'),
             id_no = request.POST.get('id_no'),
-            dl_no = request.POST.get('dl_no'),
-            passport_number = request.POST.get('passport_number'),
             tel_home = request.POST.get('tel_home'),
             tel_roam = request.POST.get('tel_roam'),
             date_hired = request.POST.get('date_hired'),
+            driver_photo = request.FILES.get('driver_photo'),
+            id_img = request.FILES.get('id_img'),
+            #passport and dl data
+            dl_no = request.POST.get('dl_no'),
+            dl_issuing_authority = request.POST.get('dl_issuing_authority'),
+            dl_front_img = request.FILES.get('dl_front_img'),
+            dl_back_img = request.FILES.get('dl_back_img'),
+            passport_number = request.POST.get('passport_number'),
+            passport_image = request.FILES.get('passport_image'),
+            #next of kin
             emergency_contact_person = request.POST.get('emergency_contact_person'),
+            emergency_contact_person_rlshp = request.POST.get('emergency_contact_person_rlshp'),
             emergency_contact_no = request.POST.get('emergency_contact_no'),
             emergency_contact_two = request.POST.get('emergency_contact_two'),
-            passport_photo = request.FILES.get('passport_photo'),
+            assigned_vehicle = assigned_vehicle,
         )
 
         messages.success(request, f'Driver was added successfully.')
@@ -205,20 +271,31 @@ def update_driver(request, pk):
     company = get_user_company(request) #get request user company
     driver = Driver.objects.get(id=pk, company=company)
     if request.method == 'POST':
+        assigned_driver_id  = request.POST.get('assigned_vehicle')
+        assigned_vehicle = Vehicle.objects.get(id=assigned_driver_id, company=get_user_company(request))
         #update instance 
         driver.company=company
         driver.first_name = request.POST.get('first_name')
         driver.last_name = request.POST.get('last_name')
         driver.id_no = request.POST.get('id_no')
-        driver.dl_no = request.POST.get('dl_no')
-        driver.passport_number = request.POST.get('passport_number')
         driver.tel_home = request.POST.get('tel_home')
         driver.tel_roam = request.POST.get('tel_roam')
         driver.date_hired = request.POST.get('date_hired')
+        driver.driver_photo = request.FILES.get('driver_photo')
+        driver.id_img = request.FILES.get('id_img')
+
+        driver.dl_no = request.POST.get('dl_no')
+        driver.passport_number = request.POST.get('passport_number')
+        driver.dl_issuing_authority = request.POST.get('dl_issuing_authority')
+        driver.dl_front_img = request.FILES.get('dl_front_img')
+        driver.dl_back_img = request.FILES.get('dl_back_img')
+        driver.passport_image = request.FILES.get('passport_image')
+       
         driver.emergency_contact_person = request.POST.get('emergency_contact_person')
+        driver.emergency_contact_person_rlshp = request.POST.get('emergency_contact_person_rlshp')
         driver.emergency_contact_no = request.POST.get('emergency_contact_no')
         driver.emergency_contact_two = request.POST.get('emergency_contact_two')
-        driver.passport_photo = request.FILES.get('passport_photo')
+        driver.assigned_vehicle = assigned_vehicle
         driver.save()
         
         messages.success(request, f'Driver details edited successfully.')
@@ -229,15 +306,24 @@ def update_driver(request, pk):
             'first_name': driver.first_name,
             'last_name': driver.last_name,
             'id_no': driver.id_no,
-            'dl_no': driver.dl_no,
-            'passport_number': driver.passport_number,
             'tel_home': driver.tel_home,
             'tel_roam': driver.tel_roam,
             'date_hired': driver.date_hired,
+            'driver_photo': driver.driver_photo,
+            'id_img': driver.id_img,
+
+            'dl_no': driver.dl_no,
+            'passport_number': driver.passport_number,
+            'dl_issuing_authority':driver.dl_issuing_authority,
+            'dl_front_img':driver.dl_front_img,
+            'dl_back_img':driver.dl_back_img,
+            'passport_image':driver.passport_image,
+            
             'emergency_contact_person': driver.emergency_contact_person,
+            'emergency_contact_person_rlshp': driver.emergency_contact_person_rlshp,
             'emergency_contact_no': driver.emergency_contact_no,
             'emergency_contact_two': driver.emergency_contact_two,
-            'passport_photo': driver.passport_photo,
+            'assigned_vehicle': driver.assigned_vehicle,
         }
 
         form = DriverForm(initial=form_data, company=company )
@@ -749,21 +835,19 @@ def add_trip(request):
         load_id = request.POST.get('load')
         load = Load.objects.get(company=company, id=load_id)
 
-        driver_id = request.POST.get('driver')
-        driver = Driver.objects.get(company=company, id=driver_id)
 
         vehicle_id = request.POST.get('vehicle')
         vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
 
-        #create instance of a driver
+        #create instance of a trip
         trip = Trip.objects.create(
             company=company,
             load = load,
-            driver = driver,
             vehicle = vehicle,
             driver_accesory_pay = request.POST.get('driver_accesory_pay'),
             vehicle_odemeter = request.POST.get('vehicle_odemeter'),
             driver_advance = request.POST.get('driver_advance'),
+            driver_milage = request.POST.get('driver_advance'),
         )
 
         messages.success(request, f'Trip was added successfully.')
@@ -777,6 +861,107 @@ def add_trip(request):
 
 # update trip
 def update_trip(request, pk):
+    company = get_user_company(request) #get request user company
+    trip = Trip.objects.get(id=pk, company=company)
+    if request.method == 'POST':
+
+        load_id = request.POST.get('load')
+        load = Load.objects.get(company=company, id=load_id)
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+        #update instance 
+        trip.company = company
+        trip.load = load
+        trip.vehicle = vehicle
+        trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
+        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
+        trip.driver_advance = request.POST.get('driver_advance')
+        trip.driver_milage = request.POST.get('driver_milage')
+        trip.save()
+        
+        messages.success(request, f'Trip details updated successfully.')
+        return redirect('view_trip', trip.id)
+    else:
+        # prepopulate the form with existing data
+        form_data = {
+            'load': trip.load,
+            'vehicle': trip.vehicle,
+            'driver_accesory_pay': trip.driver_accesory_pay,
+            'vehicle_odemeter': trip.vehicle_odemeter,
+            'driver_advance': trip.driver_advance,
+            'driver_milage': trip.driver_milage,
+        }
+
+        form = TripForm(initial=form_data, company=company )
+        context = {
+            'trip':trip,
+            'form':form
+        }
+        return render(request,'trip/trip/update-trip.html', context)
+#--ends
+
+#trip list
+def list_trips(request):
+    trips = Trip.objects.filter(company=get_user_company(request))
+    number_of_trips = trips.count()
+    context = {
+        'trips':trips,
+        'number_of_trips':number_of_trips
+    }
+    return render(request, 'trip/trip/trips-list.html', context)
+#--ends
+
+#view trip
+def view_trip(request, pk):
+    trip = Trip.objects.get(id=pk, company=get_user_company(request))
+    context={'trip':trip}
+    return render(request, 'trip/trip/view-trip.html', context)
+#--ends
+
+# remove trip
+def remove_trip(request, pk):
+    if request.method == 'POST':
+        trip = Trip.objects.get(id=pk, company=get_user_company(request))
+        trip.delete()
+        messages.success(request, f'Trip of id : {trip.trip_id} removed')
+        return redirect('list_trips')
+#--ends
+
+#---------------------------------- Payment views------------------------------------------
+
+# add payment
+def add_payment(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = PaymentForm(request.POST, company=company) 
+    if request.method == 'POST':
+
+        invoice_id = request.POST.get('invoice')
+        invoice = Invoice.objects.get(company=company, id=invoice_id)
+
+        #create instance of a payment
+        payment = Payment.objects.create(
+            company=company,
+            transaction_id = request.POST.get('transaction_id'),
+            invoice = invoice,
+            amount = request.POST.get('amount'),
+            paid_on = request.POST.get('paid_on'),
+            payment_method = request.POST.get('payment_method'),
+            remark = request.POST.get('remark'),
+        )
+
+        messages.success(request, f'Payment was added successfully.')
+        return redirect('list_payments')
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/payment/payment-list.html', context)
+#--ends
+
+# update trip
+def update_payment(request, pk):
     company = get_user_company(request) #get request user company
     trip = Trip.objects.get(id=pk, company=company)
     if request.method == 'POST':
@@ -821,7 +1006,268 @@ def update_trip(request, pk):
 #--ends
 
 #trip list
-def list_trips(request):
+def list_payments(request):
+    payments = Payment.objects.filter(company=get_user_company(request))
+    form = PaymentForm(request.POST, company=get_user_company(request)) 
+    context = {
+        'payments':payments,
+        'form':form,
+    }
+    return render(request, 'trip/payment/payment-list.html', context)
+#--ends
+
+#view trip
+def view_payment(request, pk):
+    trip = Trip.objects.get(id=pk, company=get_user_company(request))
+    context={'trip':trip}
+    return render(request, 'trip/trip/view-trip.html', context)
+#--ends
+
+# remove trip
+def remove_payment(request, pk):
+    if request.method == 'POST':
+        trip = Trip.objects.get(id=pk, company=get_user_company(request))
+        trip.delete()
+        messages.success(request, f'Trip of id : {trip.trip_id} removed')
+        return redirect('list_trips')
+#--ends
+
+#---------------------------------- Expense Category views------------------------------------------
+
+# add expense category
+def add_expense_category(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = ExpenseCategoryForm(request.POST) 
+    if request.method == 'POST':
+
+        #create instance of a driver
+        category = Expense_Category.objects.create(
+            company=company,
+            name = request.POST.get('name')
+        )
+        messages.success(request, f'Expense category was added successfully.')
+        return redirect('list_expenses')
+
+    return redirect('list_expenses')
+#--ends
+
+
+#expense category list
+def list_expenses_categories(request):
+    expenses = Expense.objects.filter(company=get_user_company(request))
+    form = ExpenseForm(request.POST, company=get_user_company(request)) 
+    category_form = ExpenseCategoryForm(request.POST)
+    context = {
+        'expenses':expenses,
+        'form':form,
+        'category_form':category_form
+       }
+    return render(request, 'trip/expense/expense-list.html', context)
+#--ends
+
+# remove expense category
+def remove_expense_category(request, pk):
+    if request.method == 'POST':
+        trip = Trip.objects.get(id=pk, company=get_user_company(request))
+        trip.delete()
+        messages.success(request, f'Trip of id : {trip.trip_id} removed')
+        return redirect('list_trips')
+#--ends
+
+#---------------------------------- Expense views------------------------------------------
+
+# add expense
+def add_expense(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = ExpenseForm(request.POST, company=company) 
+    if request.method == 'POST':
+
+        trip_id = request.POST.get('trip')
+        trip = Trip.objects.get(company=company, id=trip_id)
+
+        expense_category_id = request.POST.get('expense_category')
+        expense_category = Expense_Category.objects.get(company=company, id=expense_category_id)
+
+        #create instance of a driver
+        expense = Expense.objects.create(
+            company=company,
+            trip = trip,
+            expense_category = expense_category,
+            amount = request.POST.get('amount'),
+            date_paid = request.POST.get('date_paid'),
+            paid_to = request.POST.get('paid_to'),
+            receipt = request.FILES.get('receipt'),
+        )
+
+        messages.success(request, f'Expense was added successfully.')
+        return redirect('list_expenses')
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/expense/expense-list.html', context)
+#--ends
+
+# update trip
+def update_expense(request, pk):
+    company = get_user_company(request) #get request user company
+    trip = Trip.objects.get(id=pk, company=company)
+    if request.method == 'POST':
+
+        load_id = request.POST.get('load')
+        load = Load.objects.get(company=company, id=load_id)
+
+        driver_id = request.POST.get('driver')
+        driver = Driver.objects.get(company=company, id=driver_id)
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+        #update instance 
+        trip.company = company
+        trip.driver = driver
+        trip.load = load
+        trip.vehicle = vehicle
+        trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
+        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
+        trip.driver_advance = request.POST.get('driver_advance')
+        trip.save()
+        
+        messages.success(request, f'Trip details updated successfully.')
+        return redirect('view_trip', trip.id)
+    else:
+        # prepopulate the form with existing data
+        form_data = {
+            'driver': trip.driver,
+            'load': trip.load,
+            'vehicle': trip.vehicle,
+            'driver_accesory_pay': trip.driver_accesory_pay,
+            'vehicle_odemeter': trip.vehicle_odemeter,
+            'driver_advance': trip.driver_advance
+        }
+
+        form = TripForm(initial=form_data, company=company )
+        context = {
+            'trip':trip,
+            'form':form
+        }
+        return render(request,'trip/trip/update-trip.html', context)
+#--ends
+
+#trip list
+def list_expenses(request):
+    expenses = Expense.objects.filter(company=get_user_company(request))
+    form = ExpenseForm(request.POST, company=get_user_company(request)) 
+    category_form = ExpenseCategoryForm(request.POST)
+    context = {
+        'expenses':expenses,
+        'form':form,
+        'category_form':category_form
+       }
+    return render(request, 'trip/expense/expense-list.html', context)
+#--ends
+
+#view trip
+def view_expense(request, pk):
+    trip = Trip.objects.get(id=pk, company=get_user_company(request))
+    context={'trip':trip}
+    return render(request, 'trip/trip/view-trip.html', context)
+#--ends
+
+# remove trip
+def remove_expense(request, pk):
+    if request.method == 'POST':
+        trip = Trip.objects.get(id=pk, company=get_user_company(request))
+        trip.delete()
+        messages.success(request, f'Trip of id : {trip.trip_id} removed')
+        return redirect('list_trips')
+#--ends
+
+#---------------------------------- Invoice views------------------------------------------
+# add invoice
+def add_invoice(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = TripForm(request.POST, company=company) 
+    if request.method == 'POST':
+
+        load_id = request.POST.get('load')
+        load = Load.objects.get(company=company, id=load_id)
+
+        driver_id = request.POST.get('driver')
+        driver = Driver.objects.get(company=company, id=driver_id)
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+
+        #create instance of a driver
+        trip = Trip.objects.create(
+            company=company,
+            load = load,
+            driver = driver,
+            vehicle = vehicle,
+            driver_accesory_pay = request.POST.get('driver_accesory_pay'),
+            vehicle_odemeter = request.POST.get('vehicle_odemeter'),
+            driver_advance = request.POST.get('driver_advance'),
+        )
+
+        messages.success(request, f'Trip was added successfully.')
+        return redirect('view_trip', trip.id)
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/trip/add-trip.html', context)
+#--ends
+
+# update trip
+def update_invoice(request, pk):
+    company = get_user_company(request) #get request user company
+    trip = Trip.objects.get(id=pk, company=company)
+    if request.method == 'POST':
+
+        load_id = request.POST.get('load')
+        load = Load.objects.get(company=company, id=load_id)
+
+        driver_id = request.POST.get('driver')
+        driver = Driver.objects.get(company=company, id=driver_id)
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+        #update instance 
+        trip.company = company
+        trip.driver = driver
+        trip.load = load
+        trip.vehicle = vehicle
+        trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
+        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
+        trip.driver_advance = request.POST.get('driver_advance')
+        trip.save()
+        
+        messages.success(request, f'Trip details updated successfully.')
+        return redirect('view_trip', trip.id)
+    else:
+        # prepopulate the form with existing data
+        form_data = {
+            'driver': trip.driver,
+            'load': trip.load,
+            'vehicle': trip.vehicle,
+            'driver_accesory_pay': trip.driver_accesory_pay,
+            'vehicle_odemeter': trip.vehicle_odemeter,
+            'driver_advance': trip.driver_advance
+        }
+
+        form = TripForm(initial=form_data, company=company )
+        context = {
+            'trip':trip,
+            'form':form
+        }
+        return render(request,'trip/trip/update-trip.html', context)
+#--ends
+
+#trip list
+def list_invoices(request):
     trips = Trip.objects.filter(company=get_user_company(request))
     number_of_trips = trips.count()
     context = {
@@ -832,14 +1278,14 @@ def list_trips(request):
 #--ends
 
 #view trip
-def view_trip(request, pk):
+def view_invoice(request, pk):
     trip = Trip.objects.get(id=pk, company=get_user_company(request))
     context={'trip':trip}
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
 
 # remove trip
-def remove_trip(request, pk):
+def remove_invoice(request, pk):
     if request.method == 'POST':
         trip = Trip.objects.get(id=pk, company=get_user_company(request))
         trip.delete()
@@ -847,4 +1293,180 @@ def remove_trip(request, pk):
         return redirect('list_trips')
 #--ends
 
-#---------------------------------- Trip views------------------------------------------
+#---------------------------------- Estimate views------------------------------------------
+
+# add estimate
+def add_estimate(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = TripForm(request.POST, company=company) 
+    if request.method == 'POST':
+
+        load_id = request.POST.get('load')
+        load = Load.objects.get(company=company, id=load_id)
+
+        driver_id = request.POST.get('driver')
+        driver = Driver.objects.get(company=company, id=driver_id)
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+
+        #create instance of a driver
+        trip = Trip.objects.create(
+            company=company,
+            load = load,
+            driver = driver,
+            vehicle = vehicle,
+            driver_accesory_pay = request.POST.get('driver_accesory_pay'),
+            vehicle_odemeter = request.POST.get('vehicle_odemeter'),
+            driver_advance = request.POST.get('driver_advance'),
+        )
+
+        messages.success(request, f'Trip was added successfully.')
+        return redirect('view_trip', trip.id)
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/trip/add-trip.html', context)
+#--ends
+
+# update trip
+def update_estimate(request, pk):
+    company = get_user_company(request) #get request user company
+    trip = Trip.objects.get(id=pk, company=company)
+    if request.method == 'POST':
+
+        load_id = request.POST.get('load')
+        load = Load.objects.get(company=company, id=load_id)
+
+        driver_id = request.POST.get('driver')
+        driver = Driver.objects.get(company=company, id=driver_id)
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+        #update instance 
+        trip.company = company
+        trip.driver = driver
+        trip.load = load
+        trip.vehicle = vehicle
+        trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
+        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
+        trip.driver_advance = request.POST.get('driver_advance')
+        trip.save()
+        
+        messages.success(request, f'Trip details updated successfully.')
+        return redirect('view_trip', trip.id)
+    else:
+        # prepopulate the form with existing data
+        form_data = {
+            'driver': trip.driver,
+            'load': trip.load,
+            'vehicle': trip.vehicle,
+            'driver_accesory_pay': trip.driver_accesory_pay,
+            'vehicle_odemeter': trip.vehicle_odemeter,
+            'driver_advance': trip.driver_advance
+        }
+
+        form = TripForm(initial=form_data, company=company )
+        context = {
+            'trip':trip,
+            'form':form
+        }
+        return render(request,'trip/trip/update-trip.html', context)
+#--ends
+
+#trip list
+def list_estimates(request):
+    trips = Trip.objects.filter(company=get_user_company(request))
+    number_of_trips = trips.count()
+    context = {
+        'trips':trips,
+        'number_of_trips':number_of_trips
+    }
+    return render(request, 'trip/trip/trips-list.html', context)
+#--ends
+
+#view trip
+def view_estimate(request, pk):
+    trip = Trip.objects.get(id=pk, company=get_user_company(request))
+    context={'trip':trip}
+    return render(request, 'trip/trip/view-trip.html', context)
+#--ends
+
+# remove trip
+def remove_estimate(request, pk):
+    if request.method == 'POST':
+        trip = Trip.objects.get(id=pk, company=get_user_company(request))
+        trip.delete()
+        messages.success(request, f'Trip of id : {trip.trip_id} removed')
+        return redirect('list_trips')
+#--ends
+
+#---------------------------------- Reminder views------------------------------------------
+
+# add reminder
+def add_reminder(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = ReminderForm(request.POST, company=company) 
+    if request.method == 'POST':
+
+        vehicle_id = request.POST.get('vehicle')
+        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
+
+        current_date = timezone.now().date()
+        next_date_str = request.POST.get('next_date')
+
+        # Convert the next_date string to a datetime.date object
+        next_date = datetime.strptime(next_date_str, '%Y-%m-%d').date()
+
+        if next_date < current_date:
+            status = 'Overdue'
+        else:
+            status = 'Active'
+
+        #create instance of a reminder
+        reminder = Reminder.objects.create(
+            company=company,
+            vehicle = vehicle,
+            name = request.POST.get('name'),
+            frequency = request.POST.get('frequency'),
+            status = status,
+            last_date = request.POST.get('last_date'),
+            next_date = request.POST.get('next_date'),
+        )
+
+        messages.success(request, f'Reminder was set.')
+        return redirect('list_reminders')
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/reminder/reminders-list.html', context)
+#--ends
+
+#reminder list
+def list_reminders(request):
+    company = get_user_company(request)
+    reminders = Reminder.objects.filter(company=company)
+    number_of_reminders = reminders.count()
+    reminder_form = ReminderForm(request.POST, company=company) 
+    context = {
+        'reminders':reminders,
+        'number_of_reminders':number_of_reminders,
+        'reminder_form':reminder_form
+    }
+    return render(request, 'trip/reminder/reminders-list.html', context)
+#--ends
+
+# remove reminder
+def remove_reminder(request, pk):
+    #if request.method == 'POST':
+    reminder = Reminder.objects.get(id=pk, company=get_user_company(request))
+    reminder.delete()
+    messages.success(request, 'Reminder removed')
+    return redirect('list_reminders')
+#--ends
+
+#---------------------------------- Reminder views------------------------------------------

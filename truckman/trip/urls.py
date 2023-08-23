@@ -70,4 +70,48 @@ urlpatterns = [
     path('list_trips', views.list_trips, name='list_trips'),
     #--ends
 
+    #payment urls
+    path('add_payment', views.add_payment, name='add_payment'),
+    path('update_payment/<str:pk>', views.update_payment, name='update_payment'),
+    path('remove_payment/<str:pk>', views.remove_payment, name='remove_payment'),
+    path('view_payment/<str:pk>', views.view_payment, name='view_payment'),
+    path('list_payments', views.list_payments, name='list_payments'),
+    #--ends
+
+    #expense category urls
+    path('add_expense_category', views.add_expense_category, name='add_expense_category'),
+    path('remove_expense_category/<str:pk>', views.remove_expense_category, name='remove_expense_category'),
+    path('list_expenses_categories', views.list_expenses_categories, name='list_expenses_categories'),
+    #--ends
+
+    #expense urls
+    path('add_expense', views.add_expense, name='add_expense'),
+    path('update_expense/<str:pk>', views.update_expense, name='update_expense'),
+    path('remove_expense/<str:pk>', views.remove_expense, name='remove_expense'),
+    path('view_expense/<str:pk>', views.view_expense, name='view_expense'),
+    path('list_expenses', views.list_expenses, name='list_expenses'),
+    #--ends
+
+    #invoice urls
+    path('add_invoice', views.add_invoice, name='add_invoice'),
+    path('update_invoice/<str:pk>', views.update_invoice, name='update_invoice'),
+    path('remove_invoice/<str:pk>', views.remove_invoice, name='remove_invoice'),
+    path('view_invoice/<str:pk>', views.view_invoice, name='view_invoice'),
+    path('list_invoices', views.list_invoices, name='list_invoices'),
+    #--ends
+
+    #estimate urls
+    path('add_estimate', views.add_estimate, name='add_estimate'),
+    path('update_estimate/<str:pk>', views.update_estimate, name='update_estimate'),
+    path('remove_estimate/<str:pk>', views.remove_estimate, name='remove_estimate'),
+    path('view_estimate/<str:pk>', views.view_estimate, name='view_estimate'),
+    path('list_estimates', views.list_estimates, name='list_estimates'),
+    #--ends
+
+    #reminder urls
+    path('add_reminder', views.add_reminder, name='add_reminder'),
+    path('remove_reminder/<str:pk>', views.remove_reminder, name='remove_reminder'),
+    path('list_reminders', views.list_reminders, name='list_reminders'),
+    #--ends
+
 ]

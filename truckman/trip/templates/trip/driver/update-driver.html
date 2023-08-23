@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}  
 
 {% block content %}
@@ -18,119 +19,237 @@
                 </div><!-- .nk-block-head -->
                 <div class="nk-block">
                     <div class="card card-bordered">
-                        <div class="card-inner">
+                        <div class="card-inner-group">
                             <form action="{% url 'update_driver' driver.id %}" method="POST" enctype="multipart/form-data" >
                                 {% csrf_token %}
-                                <div class="row gy-4">
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label" for="name">First Name</label>
-                                            <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
-                                            {{ form.first_name }}
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label" for="generic">Last Name</label>
-                                            <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
-                                            {{ form.last_name }}
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label" for="sKU">ID No</label>
-                                            <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
-                                            {{ form.id_no }}
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Driving Licence No.</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.dl_no }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Passport Number</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.passport_number }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Home Telephone</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.tel_home }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Roaming Telephone</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.tel_roam }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Date Hired</label>
-                                            <div class="form-control-wrap">
-                                                <div class="form-icon form-icon-right">
-                                                    <em class="icon ni ni-calendar"></em>
-                                                </div>
-                                                <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
-                                                {{ form.date_hired }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Emergency Contact Person</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.emergency_contact_person }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Emergency Contact Number</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.emergency_contact_no }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4">
-                                        <div class="form-group">
-                                            <label class="form-label">Emergency Contact Number II</label>
-                                            <div class="form-control-wrap">
-                                                {{ form.emergency_contact_two }}
-                                            </div>
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4"> 
-                                        <div class="form-group">
-                                            <label class="form-label" for="customFileLabel">Driver Passport</label>
-                                            <div class="form-control-wrap">
-                                                <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
-                                                    {{ form.passport_photo }}
-                                                    <label class="form-file-label" for="customFile">Choose file</label>
-                                                </div>
-                                            </div>
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Basic Details:</h5>
+                                            <p>Add driver basic detials. </p>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-primary">Update Details</button>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="name">First Name</label>
+                                                    <!--<input type="text" name="plate_number" class="form-control" id="name" placeholder="Registration Number" required> -->
+                                                    {{ form.first_name }}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="generic">Last Name</label>
+                                                    <!--<input type="text" name="trailer_number" class="form-control" id="generic" placeholder="Trailer Number">-->
+                                                    {{ form.last_name }}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="sKU">ID No</label>
+                                                    <!--<input type="text" name="vin" class="form-control" id="sKU" placeholder="Vehicle Identification Number">-->
+                                                    {{ form.id_no }}
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Home Telephone</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.tel_home }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Roaming Telephone</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.tel_roam }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Date Hired</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-icon form-icon-right">
+                                                            <em class="icon ni ni-calendar"></em>
+                                                        </div>
+                                                        <!--<input type="text" name="insurance_expiry" class="form-control date-picker" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd">-->
+                                                        {{ form.date_hired }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4"> 
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">Passport Photo</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                            {{ form.driver_photo }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4"> 
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">ID Image</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                            {{ form.id_img }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Driving Licence & Passport Details:</h5>
+                                            <p>Add driver driving licence and passport detials. </p>
                                         </div>
-                                    </div><!--col-->
-                                </div><!--row-->
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Driving Licence No.</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.dl_no }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">DL Issuing Authority</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.dl_issuing_authority }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4"> 
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">DL Front Image</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                            {{ form.dl_front_img }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4"> 
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">DL Back Image</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                            {{ form.dl_back_img }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Passport Number</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.passport_number }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4"> 
+                                                <div class="form-group">
+                                                    <label class="form-label" for="customFileLabel">Passport</label>
+                                                    <div class="form-control-wrap">
+                                                        <div class="form-file">
+                                                            <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                            {{ form.driver_photo }}
+                                                            <label class="form-file-label" for="customFile">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Next of Kin Details:</h5>
+                                            <p>Add driver Emergency Contact Person detials. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Person</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Relationship</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_person_rlshp }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Number</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_no }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Emergency Contact Number II</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.emergency_contact_two }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Assign Truck:</h5>
+                                            <p>Assign this driver a truck. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Assign Truck</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.assigned_vehicle }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary">Update Driver</button>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner-group -->
                             </form>
-                        </div><!-- .card-inner-group -->
+                        </div>
                     </div><!-- .card -->
                 </div><!-- .nk-block -->
             </div>
