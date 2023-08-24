@@ -2,10 +2,10 @@
 from django import forms
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError  
-from .models import CustomUser, Client
+from .models import CustomUser, Client, Role
 from django.forms.widgets import CheckboxSelectMultiple
 
-
+#--------------------CustomUser form ---------------------------------------------
 class CustomUserCreationForm(forms.Form): 
     company_name = forms.CharField(label='Enter Company Name')
     email = forms.EmailField(label='Enter email')
@@ -43,3 +43,67 @@ class CustomUserCreationForm(forms.Form):
         )
         return user
     '''
+
+#-------------------- Staff form ---------------------------------------------
+class StaffForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(StaffForm, self).__init__(*args, **kwargs)
+        self.fields['role'].queryset = Role.objects.filter(company=company) 
+    
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+        exclude =['company']
+
+        widgets = {
+                'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Enigma'}),
+                'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
+                'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'info@loginit.co.ke'}),
+                'password': forms.PasswordInput(attrs={'class': 'form-control'}),
+                'role': forms.Select(attrs={'class': 'form-select js-select2'}), 
+                'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'254706000000'}),
+                'date_joined': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
+                'department': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Enigma'}),
+                'designation': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
+                'profile_photo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+            }    
+
+#-------------------- Staff form ---------------------------------------------
+class RoleForm(forms.Form):
+    name = forms.CharField(
+        label='Name',
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    )
+
+    # Move the queryset to the __init__ method
+    def __init__(self, *args, **kwargs):
+        super(RoleForm, self).__init__(*args, **kwargs)
+
+        # Import Permission here to ensure it's loaded at runtime
+        from django.contrib.auth.models import Permission
+
+        # Define the queryset based on the loaded Permission model
+        self.fields['permissions'] = forms.ModelMultipleChoiceField(
+            label='Permissions',
+            queryset=Permission.objects.filter(
+                content_type__model__in=[
+                    'client', 'customuser', 'role', 'vehicle_make',
+                    'vehicle_model', 'vehicle', 'driver', 'customer',
+                    'consignee', 'shipper', 'load', 'trip', 'estimate',
+                    'invoice', 'payment', 'expense', 'expense_category', 'reminder'
+                ]
+            ),
+            widget=forms.CheckboxSelectMultiple(attrs={'class': 'custom-class d-inline'}),
+        )
+
+    description = forms.CharField(
+        label='Description',
+        widget=forms.Textarea(attrs={'class': 'form-control form-control-sm'}),
+    )
+
+    def label_from_permission(self, obj):
+        return obj.name
+
+   

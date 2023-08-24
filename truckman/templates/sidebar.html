@@ -197,18 +197,16 @@
                 <h5 class="title">Human Resource</h5>
                 <ul class="nk-menu">
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                        <a href="{% url 'list_staffs' %}" class="nk-menu-link ">
                             <span class="nk-menu-icon"><em class="icon ni ni-users-fill"></em></span>
-                            <span class="nk-menu-text">Staff</span>
+                            <span class="nk-menu-text">Staffs</span>
                         </a>
-                        <ul class="nk-menu-sub">
-                            <li class="nk-menu-item">
-                                <a href="html/hospital/patient-add.html" class="nk-menu-link"><span class="nk-menu-text">Add Staff</span></a>
-                            </li>
-                            <li class="nk-menu-item">
-                                <a href="html/hospital/patient-list.html" class="nk-menu-link"><span class="nk-menu-text">Staff List</span></a>
-                            </li>
-                        </ul><!-- .nk-menu-sub -->
+                    </li><!-- .nk-menu-item -->
+                    <li class="nk-menu-item has-sub">
+                        <a href="{% url 'list_roles' %}" class="nk-menu-link ">
+                            <span class="nk-menu-icon"><em class="icon ni ni-list-thumb-alt-fill"></em></span>
+                            <span class="nk-menu-text">Roles</span>
+                        </a>
                     </li><!-- .nk-menu-item -->
                 </ul><!-- .nk-menu -->
             </div>
@@ -414,37 +412,7 @@
                     <li class="nk-menu-item">
                         <a href="html/apps-inbox.html" class="nk-menu-link">
                             <span class="nk-menu-icon"><em class="icon ni ni-inbox-fill"></em></span>
-                            <span class="nk-menu-text">Mailbox</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/apps-messages.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-chat-fill"></em></span>
-                            <span class="nk-menu-text">Messages</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/apps-file-manager.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-folder-fill"></em></span>
-                            <span class="nk-menu-text">File Manager</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/apps-chats.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-chat-circle-fill"></em></span>
-                            <span class="nk-menu-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/apps-calendar.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-calender-date-fill"></em></span>
-                            <span class="nk-menu-text">Calendar</span>
-                        </a>
-                    </li>
-                    <li class="nk-menu-item">
-                        <a href="html/apps-kanban.html" class="nk-menu-link">
-                            <span class="nk-menu-icon"><em class="icon ni ni-template-fill"></em></span>
-                            <span class="nk-menu-text">Kanban Board</span>
+                            <span class="nk-menu-text">Fuel Tracker</span>
                         </a>
                     </li>
                 </ul><!-- .nk-menu -->

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
+#--------------------------Client model-----------------------------------------
 #client model
 class Client(models.Model):
     #admin = models.OneToOneField(User, on_delete=models.CASCADE) 
@@ -23,7 +24,20 @@ class Client(models.Model):
     def __str__(self):
         return self.name
 
+#----------------------------Role model----------------------------------------------------
+#Role model
 
+class Role(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    name = models.CharField(max_length=20)
+    permissions = models.ManyToManyField(Permission, blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+    
+
+#---------------------------CustomUser model--------------------------------------
 
 class CustomUser(AbstractUser):
     # Specify a unique related_name for groups and user_permissions
@@ -43,3 +57,9 @@ class CustomUser(AbstractUser):
     )
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+    phone = models.CharField(max_length=12, null=True)
+    department = models.CharField(max_length=20, null=True)
+    designation = models.CharField(max_length=30, null=True)
+
+

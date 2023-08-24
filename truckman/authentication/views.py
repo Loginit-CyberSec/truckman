@@ -1,11 +1,13 @@
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm  
-from .models import Client, CustomUser
+from django.contrib.auth.models import Permission
+from .forms import CustomUserCreationForm, StaffForm, RoleForm 
+from .models import Client, CustomUser, Role
+from truckman.utils import get_user_company
 
-
-
+#----------------- User Views --------------------------
 #sign up a user
 def register_user(request):
     if request.method == 'POST':
@@ -67,3 +69,167 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('login')
+
+#----------------- Role Views ---------------------------
+#add role view
+def add_role(request):
+    if request.method == 'POST':
+        # Get all available permissions
+        permissions = Permission.objects.filter(
+                content_type__model__in=[
+                    'client', 'customuser', 'role', 'vehicle_make',
+                    'vehicle_model', 'vehicle', 'driver', 'customer',
+                    'consignee', 'shipper', 'load', 'trip', 'estimate',
+                    'invoice', 'payment', 'expense', 'expense_category', 'reminder' 
+                ] 
+            )
+        company = get_user_company(request) 
+
+        # Create a Role instance with form data
+        role = Role(
+            company=company,
+            name=request.POST.get('name'),
+            description=request.POST.get('description')
+        )
+        role.save()
+
+        # Get the selected permissions from form 
+        selected_permissions = request.POST.getlist('permissions')
+        role.permissions.set(selected_permissions)  # Set the selected permissions to the ManyToManyField
+
+        messages.success(request, 'Role created successfully')
+        return redirect('list_roles')
+    return render(request, 'authentication/role/roles-list.html')
+
+# update role  view
+def update_role(request, pk):
+    pass
+
+# role list view
+def list_roles(request):
+    company = get_user_company(request)
+    roles = Role.objects.filter(company=company)
+    form = RoleForm(request.POST)
+    context = {
+        'roles':roles,
+        'form':form
+    }
+    return render(request, 'authentication/role/roles-list.html', context)
+
+#  view role
+def view_role(request, pk):
+    pass
+
+#  remove role
+def remove_role(request, pk):
+    pass
+
+#----------------- Staff Views ---------------------------
+#add staff view
+def add_staff(request):
+    company=get_user_company(request)
+    form = StaffForm(request.POST, company=company)
+    if request.method == 'POST':
+
+        role_id = request.POST.get('role')
+        role = Role.objects.get(company=company, id=role_id)
+
+        #retrieve all permissions assigned to a role
+        permissions = role.permissions.all() 
+
+        #create instance of a staff
+        staff = CustomUser.objects.create(
+            company=company,
+            username = request.POST.get('email').lower(),
+            first_name = request.POST.get('first_name'),
+            last_name = request.POST.get('last_name'),
+            email = request.POST.get('email').lower(),
+            password = make_password(request.POST.get('password')),
+            role = role,
+            phone = request.POST.get('phone'),
+            designation = request.POST.get('designation'),
+            department = request.POST.get('department'),
+            date_joined = request.POST.get('date_joined'),
+            profile_photo = request.FILES.get('profile_photo'),
+        )
+        #assign staff role permissions
+        staff.user_permissions.add(*permissions)
+
+        messages.success(request, f'{staff.first_name} added as staff.')
+        return redirect('list_staffs')
+    context= {
+        'form':form,
+    }
+    return render(request, 'authentication/staff/staffs-list.html', context)
+
+# update staff  view
+def update_staff(request, pk):
+    company = get_user_company(request) 
+    staff = CustomUser.objects.get(id=pk, company=company)
+    
+    if request.method == 'POST':
+        
+        role_id = request.POST.get('role')
+        role = Role.objects.get(id=role_id, company=company)
+
+        #retrieve all permissions assigned to a role
+        permissions = role.permissions.all() 
+
+        staff.company= company
+        staff.email = request.POST.get('email').lower()
+        staff.username = request.POST.get('email').lower()
+        staff.first_name = request.POST.get('first_name')
+        staff.last_name = request.POST.get('last_name')
+        staff.phone = request.POST.get('phone')
+        staff.department = request.POST.get('department')
+        staff.designation = request.POST.get('designation')
+        staff.profile_photo = request.FILES.get('profile_photo')
+        staff.role = role
+        staff.save()
+
+        #assign staff role permissions
+        staff.user_permissions.add(*permissions)
+        
+        messages.success(request, 'Staff details updated')
+
+        return redirect('list_staffs')
+    else:
+        form_data = {
+            'email':staff.email,
+            'first_name': staff.first_name,
+            'last_name': staff.last_name,
+            'phone': staff.phone, 
+            'department':staff.department,
+            'designation':staff.designation,
+            'profile_photo':staff.profile_photo,
+            'role':staff.role,
+        }
+    
+        form = StaffForm(initial=form_data, company=company)
+
+        context = {
+            'form':form, 
+            'staff':staff
+        }
+
+        return render(request,'authentication/staff/update-staff.html', context )
+# -- ends 
+
+# staff list view
+def list_staffs(request):
+    company = get_user_company(request)
+    staffs = CustomUser.objects.filter(company=company)
+    form = StaffForm(request.POST, company=company)
+    context = {
+        'staffs':staffs,
+        'form':form
+    }
+    return render(request, 'authentication/staff/staffs-list.html', context)
+
+#  view staff
+def view_staff(request, pk):
+    pass
+
+#  remove staff
+def remove_staff(request, pk):
+    pass
