@@ -114,4 +114,9 @@ urlpatterns = [
     path('list_reminders', views.list_reminders, name='list_reminders'),
     #--ends
 
+    #-- frontend request urls
+    path('get_trip_info/<str:trip_id>/', views.get_trip_info, name='get_trip_info'),
+    path('get_vehicle_info/<str:vehicle_id>/', views.get_vehicle_info, name='get_vehicle_info'),
+    path('get_load_info/<str:load_id>/', views.get_load_info, name='get_load_info'),
+
 ]

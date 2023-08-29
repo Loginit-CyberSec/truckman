@@ -101,7 +101,14 @@
                                         <div class="nk-tb-col">
                                             <a href="{% url 'view_vehicle' vehicle.id %}">
                                                 <span class="tb-product">
-                                                    <span class="title">{{vehicle.plate_number}}</span>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <span class="title">{{ vehicle.plate_number }}</span>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <span class="small-font">{{ vehicle.trailer_number }}</span>
+                                                        </div>
+                                                    </div>
                                                 </span>
                                             </a>
                                         </div>

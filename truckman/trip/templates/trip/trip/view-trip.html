@@ -39,6 +39,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#tabItem5"><em class="icon ni ni-wallet-in"></em><span>Payments</span> </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#tabItem6"><em class="icon ni ni-wallet-out"></em><span>Expenses</span> </a>
+                                    </li>
                                 </ul>
                                 <div class="card-inner">
                                     <div class="tab-content">
@@ -528,7 +531,7 @@
                                             <div class="nk-block nk-block-between">
                                                 <div class="nk-block-head">
                                                     <h6 class="title">Payment Information</h6>
-                                                    <p>Patients payment information.</p>
+                                                    <p>Payments associated with this trip</p>
                                                 </div><!-- .nk-block-head -->
                                                 <div class="nk-block">
                                                     <a class="btn btn-icon btn-primary" data-bs-toggle="modal" href="#addPayment">
@@ -540,39 +543,69 @@
                                                 <div class="card">
                                                     <div class="nk-tb-list nk-tb-ulist is-compact">
                                                         <div class="nk-tb-item nk-tb-head">
-                                                            <div class="nk-tb-col"><span class="sub-text">Date</span></div>
-                                                            <div class="nk-tb-col tb-col-sm"><span class="sub-text">Payment Method</span></div>
+                                                            <div class="nk-tb-col"><span class="sub-text">Invoice</span></div>
+                                                            <div class="nk-tb-col"><span class="sub-text">Payment Method</span></div>
+                                                            <div class="nk-tb-col tb-col-sm"><span class="sub-text">Payment Date</span></div>
                                                             <div class="nk-tb-col"><span class="sub-text">Amount ($)</span></div>
-                                                            <div class="nk-tb-col"><span class="sub-text">Status</span></div>
                                                         </div><!-- .nk-tb-item -->
+                                                        {% for payment in payments %}
                                                         <div class="nk-tb-item">
                                                             <div class="nk-tb-col">
-                                                                <span>10 Feb 2020</span>
+                                                                <span>{{ payment.invoice.invoice_id }}</span>
                                                             </div>
                                                             <div class="nk-tb-col tb-col-sm">
-                                                                <span>Cash</span>
+                                                                <span>{{ payment.payment_method}}</span>
                                                             </div>
                                                             <div class="nk-tb-col">
-                                                                <span>200</span>
+                                                                <span>{{ payment.paid_on }}</span>
                                                             </div>
                                                             <div class="nk-tb-col">
-                                                                <span class="tb-status text-success">Paid</span>
+                                                                <span>{{ payment.amount }}</span>
                                                             </div>
                                                         </div><!-- .nk-tb-item -->
+                                                        {% endfor %}
+                                                    </div><!-- .nk-tb-list -->
+                                                </div><!-- .card -->
+                                            </div><!-- .nk-block -->
+                                        </div><!--tab pane-->
+                                        <div class="tab-pane" id="tabItem6">
+                                            <div class="nk-block nk-block-between">
+                                                <div class="nk-block-head">
+                                                    <h6 class="title">Expense Information</h6>
+                                                    <p>Expenses associated with this trip.</p>
+                                                </div><!-- .nk-block-head -->
+                                                <div class="nk-block">
+                                                    <a class="btn btn-icon btn-primary" data-bs-toggle="modal" href="#addExpense">
+                                                        <em class="icon ni ni-plus"></em>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="nk-block">
+                                                <div class="card">
+                                                    <div class="nk-tb-list nk-tb-ulist is-compact">
+                                                        <div class="nk-tb-item nk-tb-head">
+                                                            <div class="nk-tb-col"><span class="sub-text">Category</span></div>
+                                                            <div class="nk-tb-col tb-col-sm"><span class="sub-text">Date</span></div>
+                                                            <div class="nk-tb-col"><span class="sub-text">Amount ($)</span></div>
+                                                            <div class="nk-tb-col"><span class="sub-text">Paid To</span></div>
+                                                        </div><!-- .nk-tb-item -->
+                                                        {% for expense in expenses %}
                                                         <div class="nk-tb-item">
                                                             <div class="nk-tb-col">
-                                                                <span>11 Feb 2020</span>
+                                                                <span>{{ expense.expense_category}}</span>
                                                             </div>
                                                             <div class="nk-tb-col tb-col-sm">
-                                                                <span>Cash</span>
+                                                                <span>{{ expense.date_paid}}</span>
                                                             </div>
                                                             <div class="nk-tb-col">
-                                                                <span>1923</span>
+                                                                <span>{{ expense.amount }}</span>
                                                             </div>
                                                             <div class="nk-tb-col">
-                                                                <span class="tb-status text-warning">Due</span>
+                                                                <span class="tb-status text-success">{{ expense.paid_to}}</span>
                                                             </div>
                                                         </div><!-- .nk-tb-item -->
+                                                        {% endfor %}
+                                                        
                                                     </div><!-- .nk-tb-list -->
                                                 </div><!-- .card -->
                                             </div><!-- .nk-block -->
@@ -672,4 +705,187 @@
     </div>
 </div>
 <!-- content @e -->
+<!-- Add Expense-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addExpense">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Expense</h5>
+                <form action="{% url 'add_expense' %}" class="mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="invoiceId">Expense Category</label> <a data-bs-toggle="modal" href="#addExpenseCategory" class="btn btn-sm btn-outline-primary"><span>Add Category</span><em class="icon ni ni-plus-sm"></em></a>
+                                <div class="form-control-wrap">
+                                    {{ form.expense_category }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Trip</label>
+                                <div class="form-control-wrap">
+                                    {{ form.trip }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Amount</label>
+                                <div class="form-control-wrap">
+                                    {{ form.amount }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Date Paid</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-icon form-icon-right">
+                                        <em class="icon ni ni-calendar"></em>
+                                    </div>
+                                    {{form.date_paid}}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="expenseHead">Paid To</label>
+                                <div class="form-control-wrap">
+                                    {{ form.paid_to }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="customFileLabel">Receipt</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-file">
+                                        <!--<input type="file" class="form-file-input" id="customFile">-->
+                                        {{ form.receipt }}
+                                        <label class="form-file-label" for="customFile">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Expense</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Add Expense Category -->
+<div class="modal fade" tabindex="-1" role="dialog" id="addExpenseCategory">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Expense Category</h5>
+                <form action="{% url 'add_expense_category' %}" class="mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Expense Category Name</label> 
+                                <div class="form-control-wrap">
+                                    {{ category_form.name }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Category</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Add Payment-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addPayment">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Payment</h5>
+                <form action="{% url 'add_payment' %}" class="mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="invoiceId">Transaction ID </label>
+                                <div class="form-control-wrap">
+                                    {{payment_form.transaction_id}}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="invoiceId">Invoice ID</label>
+                                <div class="form-control-wrap">
+                                    {{payment_form.invoice}}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Amount</label>
+                                <div class="form-control-wrap">
+                                    {{payment_form.amount}}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="category">Payment Method</label>
+                                <div class="form-control-wrap">
+                                    {{payment_form.payment_method}}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Date Paid</label>
+                                <div class="form-control-wrap">
+                                    <div class="form-icon form-icon-right">
+                                        <em class="icon ni ni-calendar"></em>
+                                    </div>
+                                    {{payment_form.paid_on}}
+                                </div>
+                            </div>
+                        </div><!--col-->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="expenseHead">Remark</label>
+                                <div class="form-control-wrap">
+                                    {{payment_form.remark}}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <li>
+                                    <button type="submit" class="btn btn-primary" > Add Payment</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
 {% endblock content %} 

@@ -53,6 +53,7 @@ class Vehicle(models.Model):
     truck_logbook = models.ImageField(upload_to='vehicle_images/', null=True)
     trailer_logbook = models.ImageField(upload_to='vehicle_images/', null=True)
     good_transit_licence  = models.ImageField(upload_to='vehicle_images/', null=True)
+    is_assigned_driver = models.BooleanField(default=False)
      
 
     def __str__(self):
@@ -236,12 +237,13 @@ FEE_TYPE = (
     ('PER QUANTITY','Per Quantity'),
 ) 
 
+'''
 AMOUNT_TYPE = (
     ('FLAT FEE','Flat Fee'),
     ('PER MILE','Per Mile'),
     ('PERCENTAGE','Percent')
 ) 
-
+'''
 QUANTITY_TYPE = (
     ('BARREL','Barrel'),
     ('BOXES','Boxes'),
@@ -271,15 +273,15 @@ class Load(models.Model):
     #--primary fee--
     primary_fee = models.FloatField()
     primary_fee_type = models.CharField(max_length=30, choices=FEE_TYPE, default='Per Mile')
-    fuel_surcharge_fee = models.FloatField()
-    fsc_amount_type = models.CharField(max_length=30, choices=AMOUNT_TYPE, default='Flat Fee')
+    #fuel_surcharge_fee = models.FloatField()
+    #fsc_amount_type = models.CharField(max_length=30, choices=AMOUNT_TYPE, default='Flat Fee')
+
     #--accessory fees--
-    broker_commission = models.FloatField(null=True, blank=True)
-    border_agent_fee = models.FloatField()
-    road_user = models.FloatField()
-    gate_tolls = models.FloatField()
-    #fines = models.FloatField()
-    #additional_fees = models.FloatField()
+    #broker_commission = models.FloatField(null=True, blank=True)
+    #border_agent_fee = models.FloatField()
+    #road_user = models.FloatField()
+    #gate_tolls = models.FloatField()
+    
     invoice_advance = models.FloatField()
     #others
     legal_disclaimer = models.TextField(null=True, blank=True)
@@ -311,8 +313,11 @@ class Trip(models.Model):
     load = models.ForeignKey(Load, on_delete=models.SET_NULL , null=True)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
     vehicle_odemeter = models.BigIntegerField()
-    #pickup_cordinates = models.PointField(null=True)
-    #destination_cordinates =
+    #consider using google maps later
+    pick_up_location = models.CharField(null=True)
+    drop_off_location = models.CharField(null=True)
+    distance = models.CharField(null=True)
+
     driver_accesory_pay = models.IntegerField(null=True)
     driver_advance = models.IntegerField(null=True)
     driver_milage = models.FloatField(null=True)
@@ -352,27 +357,39 @@ class Service(models.Model):
     unit = models.IntegerField(default=1) #km/miles
     unit_price = models.FloatField(default=0.00)
     tax = models.FloatField(default=0.00) #in %
-    description = models.TextField(null=True, blank=True)
+    amount = models.FloatField(default=0.00) 
+    description = models.CharField(max_length=150, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 # estimate model
+ESTIMATE_STATUS = (
+    ('Accepted','Accepted'),
+    ('Waiting','Waiting'),
+    ('Declined','Declined'),
+)
 class Estimate(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     estimate_id = models.CharField(max_length=7, unique=True, editable=False)
-    services = models.ManyToManyField(Service) 
+    item = models.CharField(max_length=20, null=True)
+    quantity = models.IntegerField(default=0.00)
+    unit_price = models.IntegerField(default=0.00)
+    description = models.CharField(max_length=100, null=True)
     sub_total = models.FloatField(default=0.00)
+    tax = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
     total = models.FloatField(default=0.00)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     valid_till = models.DateField()
     date_added = models.DateTimeField(auto_now_add=True)
     note = models.TextField(null=True)
+    status = models.CharField(max_length=20, choices=ESTIMATE_STATUS, default='Waiting')
+    is_sent = models.BooleanField(default=False)
 
-    #generate customer_id 
+    #generate estimate_id 
     def save(self, *args, **kwargs):
-        if not self.trip_id:
+        if not self.estimate_id:
             prefix = 'QU'
             # Averting race condition using 'select_for_update()'
             with transaction.atomic():
@@ -390,18 +407,25 @@ class Estimate(models.Model):
     
 #---------------------------------- Invoice Modules -----------------------------------------------
 # invoice model
+INVOICE_STATUS = (
+    ('Paid','Paid'),
+    ('Unpaid','Unpaid'),
+    ('Partially Paid','Partially Paid'),
+)
 class Invoice(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     invoice_id = models.CharField(max_length=7, unique=True, editable=False)
-    services = models.ManyToManyField(Service) 
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True) 
     trip = models.ForeignKey(Trip, on_delete=models.SET_NULL, null=True, blank=True)
     sub_total = models.FloatField(default=0.00)
+    tax = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
     total = models.FloatField(default=0.00)
-    valid_till = models.DateField()
+    balance = models.FloatField(default=0.00)
     invoice_date = models.DateField()
     due_date = models.DateField()
     date_added = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=30, choices=INVOICE_STATUS, default='Unpaid')
     note = models.TextField(null=True)
 
     #generate customer_id 
@@ -419,13 +443,26 @@ class Invoice(models.Model):
                     self.invoice_id = prefix + '0001'
         super().save(*args, **kwargs)
 
+    def amount_paid(self):
+        # Calculate the total amount paid for this invoice by summing up related payments
+        total_paid = 0.00
+
+        # Iterate through all payments related to this invoice and sum their amounts
+        related_payments = self.payment_set.all()
+        for payment in related_payments:
+            total_paid += payment.amount
+
+        return total_paid
+
     def __str__(self):
         return self.invoice_id
+    
     
 #---------------------------------- Payment Modules -----------------------------------------------
 # payment model
 class Payment(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    payment_id = models.CharField(max_length=7, unique=True, editable=False)
     transaction_id = models.CharField(max_length=20, null=True, blank=True)
     invoice = models.ForeignKey(Invoice, on_delete=models.SET_NULL , null=True)
     amount = models.FloatField(default=0.00)
@@ -436,7 +473,7 @@ class Payment(models.Model):
 
     #generate customer_id 
     def save(self, *args, **kwargs):
-        if not self.trip_id:
+        if not self.payment_id:
             prefix = 'PA'
             # Averting race condition using 'select_for_update()'
             with transaction.atomic():

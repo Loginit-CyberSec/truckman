@@ -4,7 +4,6 @@ from django.db import models
 #--------------------------Client model-----------------------------------------
 #client model
 class Client(models.Model):
-    #admin = models.OneToOneField(User, on_delete=models.CASCADE) 
     name = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     phone_no = models.CharField(max_length=12, null=True, blank=True)
@@ -13,8 +12,9 @@ class Client(models.Model):
     address = models.CharField(max_length=100, null=True, blank=True)
     timezone = models.CharField(max_length=50, default='UTC')
     currency = models.CharField(max_length=10, default='USD')
-    country = models.CharField(max_length=30, default='Kenya')
-    #phone_code = models.CharField(max_length=5, default='1') 
+    city = models.CharField(max_length=20, null=True)
+    country = models.CharField(max_length=30, default='Kenya', null=True)
+    invoice_payment_details = models.TextField(null=True) 
     '''
     def get_localized_datetime(self, datetime_value):
         user_timezone = timezone.pytz.timezone(self.timezone)

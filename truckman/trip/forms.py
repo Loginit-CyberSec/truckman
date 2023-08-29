@@ -237,15 +237,15 @@ class LoadForm(forms.ModelForm):
                 #charges and fees
                 'primary_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'primary_fee_type': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'fuel_surcharge_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'fsc_amount_type': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'border_agent_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'road_user': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'gate_tolls': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'fines': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'additional_fees': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'invoice_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'broker_commission': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
+                #'fuel_surcharge_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'fsc_amount_type': forms.Select(attrs={'class': 'form-select js-select2'}),
+                #'border_agent_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'road_user': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'gate_tolls': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'fines': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'additional_fees': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'invoice_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'broker_commission': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 #others
                 'legal_disclaimer': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some legal dissclaimer...'}),
                 'notes': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some notes/description about the load..'})
@@ -258,7 +258,7 @@ class TripForm(forms.ModelForm):
         company = kwargs.pop('company')# Get the company from kwargs
         super(TripForm, self).__init__(*args, **kwargs)
         self.fields['load'].queryset = Load.objects.filter(company=company) 
-        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company)
+        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company, is_assigned_driver=True)
     
     class Meta:
         model = Trip
@@ -266,12 +266,15 @@ class TripForm(forms.ModelForm):
         exclude =['company', 'trip_id', 'date_added']
 
         widgets = {
-                'load': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'vehicle': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'load': forms.Select(attrs={'class': 'form-select js-select2', 'id':'load'}),
+                'vehicle': forms.Select(attrs={'class': 'form-select js-select2','id':'vehicle'}),
                 'vehicle_odemeter': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_milage': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
                 'driver_accesory_pay': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
-                'driver_advance': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'600'}), 
+                'driver_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'600'}), 
+                'pick_up_location': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Nairobi'}), 
+                'drop_off_location': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Kampala'}),
+                'distance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'1000'}),
         }
 
 #---------------------------------- Service forms -----------------------------------------------
@@ -297,7 +300,6 @@ class EstimateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')# Get the company from kwargs
         super(EstimateForm, self).__init__(*args, **kwargs)
-        self.fields['services'].queryset = Service.objects.filter(company=company) 
         self.fields['customer'].queryset = Customer.objects.filter(company=company) 
     
     class Meta:
@@ -306,13 +308,16 @@ class EstimateForm(forms.ModelForm):
         exclude =['company', 'estimate_id', 'date_added']
 
         widgets = {
-                'customer': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'services': forms.Select(attrs={'class': 'form-select js-select2'}),# multichoices change
-                'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
-                'total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
+                'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customer'}),
+                'item': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Steel Coils'}),
+                'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some descriptions.'}),
+                #'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
+                #'total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
                 'valid_till': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
-                'note': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Some notes/description about the load..'})
+                'note': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Note some terms/remarks here.'}),
+                'status': forms.Select(attrs={'class': 'form-select js-select2'}), #for updating estimate.
             }    
 
 #---------------------------------- Invoice forms -----------------------------------------------
@@ -322,24 +327,24 @@ class InvoiceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')# Get the company from kwargs
         super(InvoiceForm, self).__init__(*args, **kwargs)
-        self.fields['services'].queryset = Service.objects.filter(company=company) 
+        self.fields['service'].queryset = Service.objects.filter(company=company) 
         self.fields['trip'].queryset = Trip.objects.filter(company=company) 
     
     class Meta:
         model = Invoice
         fields = '__all__'
-        exclude =['company', 'invoice_id', 'date_added']
+        exclude =['company',  'invoice_id', 'date_added']
 
         widgets = {
-                'trip': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'services': forms.Select(attrs={'class': 'form-select js-select2'}),# multichoices change
+                'trip': forms.Select(attrs={'class': 'form-select js-select2', 'id':'trip'}),
+                'service': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
                 'total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'10'}),
                 'valid_till': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'invoice_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'due_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
-                'note': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Some notes/description about the load..'})
+                'note': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Add payment details here'})
             }    
 
 #---------------------------------- Payment forms -----------------------------------------------
@@ -362,7 +367,7 @@ class PaymentForm(forms.ModelForm):
                 'amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'paid_on': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'payment_method': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'ETF'}),
-                'remark': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Some remarks'}),
+                'remark': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some remarks'}),
             }    
 
 #---------------------------------- Expense Category forms --------------------------------------

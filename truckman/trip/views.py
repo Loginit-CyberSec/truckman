@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import datetime
 from django.contrib import messages
+from django.http import JsonResponse
 from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Consignee, Shipper, Load, Trip
 
 from . models import (
@@ -17,7 +18,9 @@ from . models import (
     Payment,
     Invoice,
     Expense_Category,
-    Reminder
+    Reminder,
+    Service,
+    Estimate
 )
 
 from .forms import (
@@ -33,7 +36,9 @@ from .forms import (
     ExpenseForm,
     PaymentForm, 
     ExpenseCategoryForm,
-    ReminderForm
+    ReminderForm,
+    InvoiceForm,
+    EstimateForm
 )
 
 from truckman.utils import get_user_company
@@ -839,6 +844,8 @@ def add_trip(request):
         vehicle_id = request.POST.get('vehicle')
         vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
 
+        distance = int(request.POST.get('distance')) + 50
+
         #create instance of a trip
         trip = Trip.objects.create(
             company=company,
@@ -848,6 +855,38 @@ def add_trip(request):
             vehicle_odemeter = request.POST.get('vehicle_odemeter'),
             driver_advance = request.POST.get('driver_advance'),
             driver_milage = request.POST.get('driver_advance'),
+
+            pick_up_location = request.POST.get('pick_up_location'),
+            drop_off_location = request.POST.get('drop_off_location'),
+            distance = distance,
+        )
+        description = f"Transport of {trip.load.commodity} from {trip.pick_up_location} to {trip.drop_off_location}, ({trip.distance}kms)"
+
+        service = Service.objects.create(
+            company=company,
+            name = trip.load.commodity,
+            description = description,
+            unit = request.POST.get('unit'),
+            unit_price = request.POST.get('unit_price'),
+            amount = request.POST.get('sub_total'),
+            tax = request.POST.get('tax')
+
+        )
+
+        #generate a invoice instance
+        invoice = Invoice.objects.create(
+            company=company,
+            trip = trip,
+            service = service,
+            sub_total = request.POST.get('sub_total'),
+            discount = request.POST.get('discount'),
+            tax = request.POST.get('tax'),
+            total = request.POST.get('total'),
+            balance = request.POST.get('total'),
+            invoice_date = request.POST.get('invoice_date'),
+            due_date = request.POST.get('due_date'),
+            note = request.POST.get('note'),
+
         )
 
         messages.success(request, f'Trip was added successfully.')
@@ -914,8 +953,22 @@ def list_trips(request):
 
 #view trip
 def view_trip(request, pk):
-    trip = Trip.objects.get(id=pk, company=get_user_company(request))
-    context={'trip':trip}
+    company=get_user_company(request)
+    trip = Trip.objects.get(id=pk, company=company)
+    expenses = Expense.objects.filter(company=company, trip=trip)
+    #invoice = Invoice.objects.get(company=company, trip=trip)
+   # payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
+    form = ExpenseForm(request.POST, company=company) # for expense modal
+    category_form = ExpenseCategoryForm(request.POST) # for expense category modal
+    payment_form = PaymentForm(request.POST, company=company) # for payment modal
+    context={
+        'trip':trip,
+        'expenses':expenses,
+        #'payments':payments,
+        'form':form,
+        'category_form':category_form,
+        'payment_form':payment_form
+    }
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
 
@@ -939,20 +992,35 @@ def add_payment(request):
 
         invoice_id = request.POST.get('invoice')
         invoice = Invoice.objects.get(company=company, id=invoice_id)
+        amount = int(request.POST.get('amount'))
 
         #create instance of a payment
         payment = Payment.objects.create(
             company=company,
             transaction_id = request.POST.get('transaction_id'),
             invoice = invoice,
-            amount = request.POST.get('amount'),
+            amount = amount,
             paid_on = request.POST.get('paid_on'),
             payment_method = request.POST.get('payment_method'),
             remark = request.POST.get('remark'),
         )
 
-        messages.success(request, f'Payment was added successfully.')
-        return redirect('list_payments')
+        #update invoice balance
+        invoice.balance = invoice.balance - amount
+
+        # Update invoice status
+        if invoice.balance <= 0:
+            invoice.status = 'Paid'
+        elif invoice.balance == invoice.total:
+            invoice.status = 'Unpaid'
+        else:
+            invoice.status = 'Partially Paid'
+        invoice.save()
+  
+        #send email to client
+
+        messages.success(request, f'Payment was added and receipt sent to the customer successfuly.')
+        return redirect('view_invoice', invoice.id)
 
     context= {
         'form':form,
@@ -1189,36 +1257,47 @@ def remove_expense(request, pk):
 def add_invoice(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
-    form = TripForm(request.POST, company=company) 
+    form = InvoiceForm(request.POST, company=company)  
     if request.method == 'POST':
 
-        load_id = request.POST.get('load')
-        load = Load.objects.get(company=company, id=load_id)
+        trip_id = request.POST.get('trip')
+        trip = Trip.objects.get(company=company, id=trip_id)
 
-        driver_id = request.POST.get('driver')
-        driver = Driver.objects.get(company=company, id=driver_id)
+        description = f"Transport of {trip.load.commodity} from {trip.pick_up_location} to {trip.drop_off_location}, ({trip.distance}kms)"
 
-        vehicle_id = request.POST.get('vehicle')
-        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
-
-        #create instance of a driver
-        trip = Trip.objects.create(
+        service = Service.objects.create(
             company=company,
-            load = load,
-            driver = driver,
-            vehicle = vehicle,
-            driver_accesory_pay = request.POST.get('driver_accesory_pay'),
-            vehicle_odemeter = request.POST.get('vehicle_odemeter'),
-            driver_advance = request.POST.get('driver_advance'),
+            name = request.POST.get('name'),
+            description = description,
+            unit = request.POST.get('unit'),
+            unit_price = request.POST.get('unit_price'),
+            amount = request.POST.get('sub_total'),
+            tax = request.POST.get('tax')
+
         )
 
-        messages.success(request, f'Trip was added successfully.')
-        return redirect('view_trip', trip.id)
+        #create instance of a invoice
+        invoice = Invoice.objects.create(
+            company=company,
+            trip = trip,
+            service = service,
+            sub_total = request.POST.get('sub_total'),
+            discount = request.POST.get('discount'),
+            tax = request.POST.get('tax'),
+            total = request.POST.get('total'),
+            balance = request.POST.get('total'),
+            invoice_date = request.POST.get('invoice_date'),
+            due_date = request.POST.get('due_date'),
+            note = request.POST.get('note'),
+        )
+
+        messages.success(request, f'Invoice was added successfully.')
+        return redirect('view_invoice', invoice.id)
 
     context= {
         'form':form,
     }
-    return render(request, 'trip/trip/add-trip.html', context)
+    return render(request, 'trip/invoice/add-invoice.html', context)
 #--ends
 
 # update trip
@@ -1268,20 +1347,22 @@ def update_invoice(request, pk):
 
 #trip list
 def list_invoices(request):
-    trips = Trip.objects.filter(company=get_user_company(request))
-    number_of_trips = trips.count()
+    invoices = Invoice.objects.filter(company=get_user_company(request))
     context = {
-        'trips':trips,
-        'number_of_trips':number_of_trips
+        'invoices':invoices,
     }
-    return render(request, 'trip/trip/trips-list.html', context)
+    return render(request, 'trip/invoice/invoices-list.html', context)
 #--ends
 
 #view trip
 def view_invoice(request, pk):
-    trip = Trip.objects.get(id=pk, company=get_user_company(request))
-    context={'trip':trip}
-    return render(request, 'trip/trip/view-trip.html', context)
+    company = get_user_company(request)
+    invoice = Invoice.objects.get(id=pk, company=get_user_company(request))
+    context={
+        'invoice':invoice,
+        'company':company
+        }
+    return render(request, 'trip/invoice/view-invoice.html', context)
 #--ends
 
 # remove trip
@@ -1299,108 +1380,122 @@ def remove_invoice(request, pk):
 def add_estimate(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
-    form = TripForm(request.POST, company=company) 
+    form = EstimateForm(request.POST, company=company)  
     if request.method == 'POST':
 
-        load_id = request.POST.get('load')
-        load = Load.objects.get(company=company, id=load_id)
+        customer_id = request.POST.get('customer')
+        customer = Customer.objects.get(company=company, id=customer_id)
 
-        driver_id = request.POST.get('driver')
-        driver = Driver.objects.get(company=company, id=driver_id)
-
-        vehicle_id = request.POST.get('vehicle')
-        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
-
-        #create instance of a driver
-        trip = Trip.objects.create(
+        #create instance of a invoice
+        estimate = Estimate.objects.create(
             company=company,
-            load = load,
-            driver = driver,
-            vehicle = vehicle,
-            driver_accesory_pay = request.POST.get('driver_accesory_pay'),
-            vehicle_odemeter = request.POST.get('vehicle_odemeter'),
-            driver_advance = request.POST.get('driver_advance'),
+            customer = customer,
+            valid_till = request.POST.get('valid_till'),
+            description = request.POST.get('description'),
+            item = request.POST.get('item'),
+            quantity = request.POST.get('quantity'), #km/ml
+            unit_price = request.POST.get('unit_price'),
+            sub_total = request.POST.get('sub_total'),
+            discount = request.POST.get('discount'),
+            tax = request.POST.get('tax'),
+            total = request.POST.get('total'),
+            note = request.POST.get('note'),
         )
 
-        messages.success(request, f'Trip was added successfully.')
-        return redirect('view_trip', trip.id)
+        messages.success(request, f'Estimate was added successfully.')
+        return redirect('view_estimate', estimate.id)
 
     context= {
         'form':form,
     }
-    return render(request, 'trip/trip/add-trip.html', context)
+    return render(request, 'trip/estimate/add-estimate.html', context)
 #--ends
 
-# update trip
+# update estimate
 def update_estimate(request, pk):
     company = get_user_company(request) #get request user company
-    trip = Trip.objects.get(id=pk, company=company)
+    estimate = Estimate.objects.get(id=pk, company=company)
     if request.method == 'POST':
+        # block updates on accepted quotes
+        if estimate.status != 'Accepted':
 
-        load_id = request.POST.get('load')
-        load = Load.objects.get(company=company, id=load_id)
+            customer_id = request.POST.get('customer')
+            customer = Customer.objects.get(company=company, id=customer_id)
 
-        driver_id = request.POST.get('driver')
-        driver = Driver.objects.get(company=company, id=driver_id)
-
-        vehicle_id = request.POST.get('vehicle')
-        vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
-        #update instance 
-        trip.company = company
-        trip.driver = driver
-        trip.load = load
-        trip.vehicle = vehicle
-        trip.driver_accesory_pay = request.POST.get('driver_accesory_pay')
-        trip.vehicle_odemeter = request.POST.get('vehicle_odemeter')
-        trip.driver_advance = request.POST.get('driver_advance')
-        trip.save()
-        
-        messages.success(request, f'Trip details updated successfully.')
-        return redirect('view_trip', trip.id)
+            #update instance 
+            estimate.company = company
+            estimate.customer = customer
+            estimate.valid_till = request.POST.get('valid_till')
+            estimate.description = request.POST.get('description')
+            estimate.item = request.POST.get('item')
+            estimate.quantity = request.POST.get('quantity')
+            estimate.unit_price = request.POST.get('unit_price')
+            estimate.sub_total = request.POST.get('sub_total')
+            estimate.discount = request.POST.get('discount')
+            estimate.tax = request.POST.get('tax')
+            estimate.total = request.POST.get('total')
+            estimate.note = request.POST.get('note')
+            estimate.status = request.POST.get('status')
+            estimate.save()
+            
+            messages.success(request, f'Estimate details updated successfully.')
+            return redirect('view_estimate', estimate.id)
+        else:
+            messages.error(request, f'Accepted quotations can not be edited!')
+            return redirect('view_estimate', estimate.id)
     else:
         # prepopulate the form with existing data
         form_data = {
-            'driver': trip.driver,
-            'load': trip.load,
-            'vehicle': trip.vehicle,
-            'driver_accesory_pay': trip.driver_accesory_pay,
-            'vehicle_odemeter': trip.vehicle_odemeter,
-            'driver_advance': trip.driver_advance
+            'customer': estimate.customer,
+            'valid_till': estimate.valid_till,
+            'item': estimate.item,
+            'quantity': estimate.quantity,
+            'unit_price': estimate.unit_price,
+            'sub_total': estimate.sub_total,
+            'tax': estimate.tax,
+            'total': estimate.total,
+            'description': estimate.description,
+            'note': estimate.note, 
+            'status':estimate.status           
         }
 
-        form = TripForm(initial=form_data, company=company )
+        form = EstimateForm(initial=form_data, company=company )
         context = {
-            'trip':trip,
+            'estimate':estimate,
             'form':form
         }
-        return render(request,'trip/trip/update-trip.html', context)
+        return render(request,'trip/estimate/update-estimate.html', context)
 #--ends
 
-#trip list
+#estimate list
 def list_estimates(request):
-    trips = Trip.objects.filter(company=get_user_company(request))
-    number_of_trips = trips.count()
+    estimates = Estimate.objects.filter(company=get_user_company(request))
+    number_of_estimates = estimates.count()
     context = {
-        'trips':trips,
-        'number_of_trips':number_of_trips
+        'estimates':estimates,
+        'number_of_estimates':number_of_estimates
     }
-    return render(request, 'trip/trip/trips-list.html', context)
+    return render(request, 'trip/estimate/estimates-list.html', context)
 #--ends
 
-#view trip
+#view estimate
 def view_estimate(request, pk):
-    trip = Trip.objects.get(id=pk, company=get_user_company(request))
-    context={'trip':trip}
-    return render(request, 'trip/trip/view-trip.html', context)
+    company=get_user_company(request)
+    estimate = Estimate.objects.get(id=pk, company=company)
+    context={
+        'estimate':estimate,
+        'company':company
+        }
+    return render(request, 'trip/estimate/view-estimate.html', context)
 #--ends
 
-# remove trip
+# remove estimate
 def remove_estimate(request, pk):
     if request.method == 'POST':
-        trip = Trip.objects.get(id=pk, company=get_user_company(request))
-        trip.delete()
-        messages.success(request, f'Trip of id : {trip.trip_id} removed')
-        return redirect('list_trips')
+        estimate = Estimate.objects.get(id=pk, company=get_user_company(request))
+        estimate.delete()
+        messages.success(request, f'Estimate of id : {estimate.estimate_id} removed')
+        return redirect('list_estimates')
 #--ends
 
 #---------------------------------- Reminder views------------------------------------------
@@ -1470,3 +1565,58 @@ def remove_reminder(request, pk):
 #--ends
 
 #---------------------------------- Reminder views------------------------------------------
+
+
+
+#---------------------------------- front end endpoint views -------------------------------------------------------------------------
+
+
+# view to get trip info when adding an invoice
+
+def get_trip_info(request, trip_id):
+    company = get_user_company(request)
+    try:
+        trip = Trip.objects.get(id=trip_id, company=company)  # Fetch the Trip object based on the trip_id
+        trip_info = {
+            'vehicle': trip.vehicle.plate_number,
+            'customer': trip.load.customer.name,
+        }
+        return JsonResponse(trip_info)
+    except Trip.DoesNotExist:
+        return JsonResponse({'error': 'Trip not found'}, status=404)
+    
+#--------------------------- vehicle info ____________________________________________
+
+# view to get load info when adding a trip
+  
+def get_vehicle_info(request, vehicle_id):
+    company = get_user_company(request)
+    try:
+        vehicle = Vehicle.objects.get(id=vehicle_id, company=company)
+        try:
+            driver = Driver.objects.get(assigned_vehicle=vehicle, company=company)
+        except Driver.DoesNotExist:
+            driver = None
+
+        vehicle_info = {
+            'trailer': vehicle.trailer_number,
+            'driver': driver.first_name + ' ' + driver.last_name ,
+        }
+        return JsonResponse(vehicle_info)
+    except Vehicle.DoesNotExist:
+        return JsonResponse({'error': 'Vehicle not found'}, status=404)
+
+#--------------------------- load info ____________________________________________
+
+#view to get load info when adding an trip
+def get_load_info(request, load_id):
+    company = get_user_company(request)
+    try:
+        load = Load.objects.get(id=load_id, company=company)
+        load_info = {
+            'customer': load.customer.name,
+            'commodity': load.commodity,
+        }
+        return JsonResponse(load_info)
+    except Load.DoesNotExist:
+        return JsonResponse({'error': 'Load not found'}, status=404)

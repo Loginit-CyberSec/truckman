@@ -42,8 +42,14 @@
                                                 <div class="form-group">
                                                     <label class="form-label">Truck</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.vehicle}}
+                                                        {{ form.vehicle }}
                                                     </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Trailer Number</label>
+                                                    <input type="text" name="trailer" class="form-control" id="trailer" value ="{{ trip.load.vehicle.trailer_number }}" readonly>
                                                 </div>
                                             </div><!--col-->
                                             <div class="col-xxl-3 col-md-4">
@@ -65,6 +71,14 @@
                                     </div>
                                     <div class="nk-block">
                                         <div class="row gy-4">
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="full-name">Driver </label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="driver" class="form-control" id="driver" value ="{{ trip.load.vehicle.driver.first_name }} {{ trip.load.vehicle.driver.last_name }}" readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
                                                     <label class="form-label" for="full-name">Driver Milage</label>
@@ -109,6 +123,46 @@
                                                     </div>
                                                 </div>
                                             </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Commodity</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="commodity" class="form-control" id="commodity" value ="{{ trip.load.commodity}}" readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Customer</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="customer" class="form-control" id="customer" value ="{{ trip.load.customer.name}}" readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Pick-up Location</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.pick_up_location }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Drop off</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.drop_off_location }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Distance</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.distance }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <button type="submit" class="btn btn-primary">Add Trip</button>
@@ -126,4 +180,56 @@
     </div>
 </div>
 <!-- content @e -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- get vehicle and driver details on choosing a trip -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var vehicleSelect = $("#vehicle");
+        var vehicleInput = $("#vehicle");
+        var trailerInput = $("#trailer");
+        var driverInput = $("#driver");
+
+        // Add an event listener to the "Vehicle" select field
+        vehicleSelect.on("change", function () {
+            // Get the selected vehicle ID
+            var vehicleId = $(this).val();
+            console.log('This is the vehicle id', vehicleId)
+
+            // Send a GET request to fetch vehicle and customer information
+            $.get("/trip/get_vehicle_info/" + vehicleId, function (data) {
+                // Update the vehicle and customer input fields with the fetched data
+                trailerInput.val(data.trailer);
+                driverInput.val(data.driver);
+            });
+        });
+    });
+</script>
+
+<!-- get load details -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var loadSelect = $("#load");
+        var loadInput = $("#load");
+        var commodityInput = $("#commodity");
+        var customerInput = $("#customer");
+
+        // Add an event listener to the "Load" select field
+        loadSelect.on("change", function () {
+            // Get the selected load ID
+            var loadId = $(this).val();
+            console.log('This is the load id', loadId)
+
+            // Send a GET request to fetch load  information
+            $.get("/trip/get_load_info/" + loadId, function (data) {
+                // Update the customer and commodity  input fields with the fetched data
+                commodityInput.val(data.commodity);
+                customerInput.val(data.customer);
+            });
+        });
+    });
+</script>
 {% endblock content %}  
