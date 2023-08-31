@@ -40,9 +40,25 @@
                                         <div class="row gy-4">
                                             <div class="col-xxl-3 col-md-4">
                                                 <div class="form-group">
+                                                    <label class="form-label">Select Quotation</label>
+                                                    <div class="form-control-wrap">
+                                                        {{form.estimate}}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Quotation Amount</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="number" name="quoteAmount" class="form-control" id="quoteAmount" value=" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-3 col-md-4">
+                                                <div class="form-group">
                                                     <label class="form-label" for="full-name">Customer</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.customer}}
+                                                        <input type="text" name="customer" class="form-control" id="customer" value=" " readonly>
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -50,7 +66,7 @@
                                                 <div class="form-group">
                                                     <label class="form-label" for="phone-no">Commodity</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.commodity}}
+                                                        <input type="text" name="commodity" class="form-control" id="commodity" value=" " readonly>
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -58,7 +74,7 @@
                                                 <div class="form-group">
                                                     <label class="form-label" for="phone-no">Quantity</label>
                                                     <div class="form-control-wrap">
-                                                        {{form.quantity}}
+                                                        <input type="number" name="quantity" class="form-control" id="quantity" value=" " readonly>
                                                     </div>
                                                 </div>
                                             </div><!--col-->
@@ -147,92 +163,12 @@
                                 <div class="card-inner">
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title">Fees / Charges</h5>
-                                            <p>Add fees and charges associated with the load. </p>
+                                            <h5 class="title nk-block-title">Disclaimer</h5>
+                                            <p>Add disclaimer if any. </p>
                                         </div>
                                     </div>
                                     <div class="nk-block">
                                         <div class="row gy-4">
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Primary Fee</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.primary_fee }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Primary Fee Type</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.primary_fee_type}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Fuel Surcharge Fee</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.fuel_surcharge_fee }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">FSC Amount Type</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.fsc_amount_type}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Border Agent Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.border_agent_fee}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Road User Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.road_user}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Gate Toll Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.gate_tolls}}
-                                                    </div>
-                                                </div>
-                                            </div><!-- .col -->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Fines</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.fines}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Additional Fees</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.additional_fees}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-3 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Invoice Advance</label>
-                                                    <div class="form-control-wrap">
-                                                        {{form.invoice_advance}}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
                                             <div class="col-xxl-3 col-md-8">
                                                 <div class="form-group">
                                                     <label class="form-label" for="default-02">Legal Disclaimer</label>
@@ -259,4 +195,34 @@
     </div>
 </div>
 <!-- content @e -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- get estimate/quotation details on choosing a estimate -->
+<script>
+    $(document).ready(function () {
+        // Get references to the input fields and select field
+        var estimateSelect = $("#estimate");
+        var estimateAmountInput = $("#quoteAmount");
+        var estimateItemInput = $("#commodity");
+        var estimateQuantityInput = $("#quantity");
+        var estimateCustomerInput = $("#customer");
+
+        // Add an event listener to the "Estimate" select field
+        estimateSelect.on("change", function () {
+            // Get the selected estimate ID
+            var estimateId = $(this).val();
+
+            // Send a GET request to fetch estimate  information
+            $.get("/trip/get_estimate_info/" + estimateId, function (data) {
+                // Update the quotation amount input fields with the fetched data
+                estimateAmountInput.val(data.amount);
+                estimateItemInput.val(data.item);
+                estimateQuantityInput.val(data.quantity);
+                estimateCustomerInput.val(data.customer);
+            });
+        });
+    });
+</script>
+<!-- end -->
 {% endblock content %}  

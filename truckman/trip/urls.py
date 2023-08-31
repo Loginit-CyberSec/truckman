@@ -68,6 +68,8 @@ urlpatterns = [
     path('remove_trip/<str:pk>', views.remove_trip, name='remove_trip'),
     path('view_trip/<str:pk>', views.view_trip, name='view_trip'),
     path('list_trips', views.list_trips, name='list_trips'),
+    path('view_trip/add_payment/<str:pk>', views.add_payment_trip, name='add_payment_trip'),
+    path('view_trip/add_expense/<str:pk>', views.add_expense_trip, name='add_expense_trip'),
     #--ends
 
     #payment urls
@@ -118,5 +120,6 @@ urlpatterns = [
     path('get_trip_info/<str:trip_id>/', views.get_trip_info, name='get_trip_info'),
     path('get_vehicle_info/<str:vehicle_id>/', views.get_vehicle_info, name='get_vehicle_info'),
     path('get_load_info/<str:load_id>/', views.get_load_info, name='get_load_info'),
+    path('get_estimate_info/<str:estimate_id>/', views.get_estimate_info, name='get_estimate_info'),
 
 ]

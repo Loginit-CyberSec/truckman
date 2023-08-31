@@ -226,121 +226,6 @@ class Consignee(models.Model):
     def __str__(self):
         return self.name
 
-#---------------------------------- Trip & Load Modules -----------------------------------------------
-
-#Load model
-FEE_TYPE = (
-    ('FLAT FEE','Flat Fee'),
-    ('PER MILE','Per Mile'),
-    ('PER HUNDRED WEIGHT','Per Hundred Weight'),
-    ('PER TON','Per Ton'),
-    ('PER QUANTITY','Per Quantity'),
-) 
-
-'''
-AMOUNT_TYPE = (
-    ('FLAT FEE','Flat Fee'),
-    ('PER MILE','Per Mile'),
-    ('PERCENTAGE','Percent')
-) 
-'''
-QUANTITY_TYPE = (
-    ('BARREL','Barrel'),
-    ('BOXES','Boxes'),
-    ('BUSHELS','Bushels'),
-    ('CASES','Cases'),
-    ('CRATES','Crates'),
-    ('GALLONS','Gallons'),
-    ('PALLETS','Pallets'),
-    ('PIECES','Pieces'),
-) 
-
-class Load(models.Model):
-    company = models.ForeignKey(Client, on_delete=models.CASCADE)
-    load_id = models.CharField(max_length=7, unique=True, editable=False)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    shipper = models.ForeignKey(Shipper, on_delete=models.SET_NULL, null=True)
-    consignee = models.ForeignKey(Consignee, on_delete=models.SET_NULL, null=True)
-    #load details
-    quantity = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
-    quantity_type = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
-    weight =  models.IntegerField(null=True, blank=True)
-    commodity = models.CharField(max_length=155)
-    pickup_date = models.DateField()
-    delivery_date = models.DateField()
-    driver_instructions = models.TextField(null=True, blank=True)
-    #-Fees / Charges attributes -
-    #--primary fee--
-    primary_fee = models.FloatField()
-    primary_fee_type = models.CharField(max_length=30, choices=FEE_TYPE, default='Per Mile')
-    #fuel_surcharge_fee = models.FloatField()
-    #fsc_amount_type = models.CharField(max_length=30, choices=AMOUNT_TYPE, default='Flat Fee')
-
-    #--accessory fees--
-    #broker_commission = models.FloatField(null=True, blank=True)
-    #border_agent_fee = models.FloatField()
-    #road_user = models.FloatField()
-    #gate_tolls = models.FloatField()
-    
-    invoice_advance = models.FloatField()
-    #others
-    legal_disclaimer = models.TextField(null=True, blank=True)
-    notes = models.TextField(null=True, blank=True)
-    date_added = models.DateTimeField(auto_now_add=True)
-
-    #generate customer_id 
-    def save(self, *args, **kwargs):
-        if not self.load_id:
-            prefix = 'LO'
-            # Averting race condition using 'select_for_update()'
-            with transaction.atomic():
-                last_load = Load.objects.select_for_update().filter(load_id__startswith=prefix).order_by('-load_id').first()
-                if last_load:
-                    last_id = last_load.load_id[2:]  # Remove prefix
-                    next_id = str(int(last_id) + 1).zfill(4)
-                    self.load_id = prefix + next_id
-                else:
-                    self.load_id = prefix + '0001'
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.load_id
-
-# trip model
-class Trip(models.Model):
-    company = models.ForeignKey(Client, on_delete=models.CASCADE)
-    trip_id = models.CharField(max_length=7, unique=True, editable=False)
-    load = models.ForeignKey(Load, on_delete=models.SET_NULL , null=True)
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
-    vehicle_odemeter = models.BigIntegerField()
-    #consider using google maps later
-    pick_up_location = models.CharField(null=True)
-    drop_off_location = models.CharField(null=True)
-    distance = models.CharField(null=True)
-
-    driver_accesory_pay = models.IntegerField(null=True)
-    driver_advance = models.IntegerField(null=True)
-    driver_milage = models.FloatField(null=True)
-    date_added = models.DateTimeField(auto_now_add=True)
-
-    #generate customer_id 
-    def save(self, *args, **kwargs):
-        if not self.trip_id:
-            prefix = 'TR'
-            # Averting race condition using 'select_for_update()'
-            with transaction.atomic():
-                last_trip = Trip.objects.select_for_update().filter(trip_id__startswith=prefix).order_by('-trip_id').first()
-                if last_trip:
-                    last_id = last_trip.trip_id[2:]  # Remove prefix
-                    next_id = str(int(last_id) + 1).zfill(4)
-                    self.trip_id = prefix + next_id
-                else:
-                    self.trip_id = prefix + '0001'
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.trip_id
-
 #---------------------------------- Estimate  & Service Modules -----------------------------------------------
 # service model
 UNIT_TYPE = (
@@ -405,6 +290,110 @@ class Estimate(models.Model):
     def __str__(self):
         return self.estimate_id
     
+
+#---------------------------------- Trip & Load Modules -----------------------------------------------
+
+#Load model
+FEE_TYPE = (
+    ('FLAT FEE','Flat Fee'),
+    ('PER MILE','Per Mile'),
+    ('PER HUNDRED WEIGHT','Per Hundred Weight'),
+    ('PER TON','Per Ton'),
+    ('PER QUANTITY','Per Quantity'),
+) 
+
+QUANTITY_TYPE = (
+    ('BARREL','Barrel'),
+    ('BOXES','Boxes'),
+    ('BUSHELS','Bushels'),
+    ('CASES','Cases'),
+    ('CRATES','Crates'),
+    ('GALLONS','Gallons'),
+    ('PALLETS','Pallets'),
+    ('PIECES','Pieces'),
+) 
+
+
+class Load(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    load_id = models.CharField(max_length=7, unique=True, editable=False)
+    shipper = models.ForeignKey(Shipper, on_delete=models.SET_NULL, null=True)
+    consignee = models.ForeignKey(Consignee, on_delete=models.SET_NULL, null=True)
+    #load details
+    quantity = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
+    quantity_type = models.CharField(max_length=20, choices=QUANTITY_TYPE, default='Barrel')
+    weight =  models.IntegerField(null=True, blank=True)
+    commodity = models.CharField(max_length=155)
+    pickup_date = models.DateField()
+    delivery_date = models.DateField()
+    driver_instructions = models.TextField(null=True, blank=True)
+    #--primary fee--
+    estimate = models.ForeignKey(Estimate, on_delete=models.SET_NULL, null=True)
+    quote_amount = models.FloatField()
+    #others
+    legal_disclaimer = models.TextField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    #generate customer_id 
+    def save(self, *args, **kwargs):
+        if not self.load_id:
+            prefix = 'LO'
+            # Averting race condition using 'select_for_update()'
+            with transaction.atomic():
+                last_load = Load.objects.select_for_update().filter(load_id__startswith=prefix).order_by('-load_id').first()
+                if last_load:
+                    last_id = last_load.load_id[2:]  # Remove prefix
+                    next_id = str(int(last_id) + 1).zfill(4)
+                    self.load_id = prefix + next_id
+                else:
+                    self.load_id = prefix + '0001'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.load_id
+
+# trip model
+TRIP_STATUS = (
+    ('NOT STARTED ','Not Started'),
+    ('DISPATCHED','Dispatched'),
+    ('COMPLETED','Completed')
+) 
+class Trip(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    trip_id = models.CharField(max_length=7, unique=True, editable=False)
+    load = models.ForeignKey(Load, on_delete=models.SET_NULL , null=True)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
+    vehicle_odemeter = models.BigIntegerField()
+    #consider using google maps later
+    pick_up_location = models.CharField(null=True)
+    drop_off_location = models.CharField(null=True)
+    distance = models.CharField(null=True)
+    driver_accesory_pay = models.IntegerField(null=True)
+    driver_advance = models.IntegerField(null=True)
+    driver_milage = models.FloatField(null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(default='Not Started', choices=TRIP_STATUS)
+
+    #generate customer_id 
+    def save(self, *args, **kwargs):
+        if not self.trip_id:
+            prefix = 'TR'
+            # Averting race condition using 'select_for_update()'
+            with transaction.atomic():
+                last_trip = Trip.objects.select_for_update().filter(trip_id__startswith=prefix).order_by('-trip_id').first()
+                if last_trip:
+                    last_id = last_trip.trip_id[2:]  # Remove prefix
+                    next_id = str(int(last_id) + 1).zfill(4)
+                    self.trip_id = prefix + next_id
+                else:
+                    self.trip_id = prefix + '0001'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.trip_id
+
+
 #---------------------------------- Invoice Modules -----------------------------------------------
 # invoice model
 INVOICE_STATUS = (
@@ -415,8 +404,11 @@ INVOICE_STATUS = (
 class Invoice(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     invoice_id = models.CharField(max_length=7, unique=True, editable=False)
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True) 
     trip = models.ForeignKey(Trip, on_delete=models.SET_NULL, null=True, blank=True)
+    item = models.CharField(max_length=20, null=True)
+    quantity = models.IntegerField(default=0.00)
+    unit_price = models.IntegerField(default=0.00)
+    description = models.CharField(max_length=100, null=True)
     sub_total = models.FloatField(default=0.00)
     tax = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
@@ -424,8 +416,8 @@ class Invoice(models.Model):
     balance = models.FloatField(default=0.00)
     invoice_date = models.DateField()
     due_date = models.DateField()
-    date_added = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=30, choices=INVOICE_STATUS, default='Unpaid')
+    is_sent = models.BooleanField(default=False)
     note = models.TextField(null=True)
 
     #generate customer_id 

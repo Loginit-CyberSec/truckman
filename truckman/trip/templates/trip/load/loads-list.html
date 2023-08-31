@@ -221,14 +221,11 @@
                                                         <label class="custom-control-label" for="uid"></label>
                                                     </div>
                                                 </div>
-                                                <div class="nk-tb-col"><span class="sub-text">Trip ID</span></div>
+                                                <div class="nk-tb-col"><span class="sub-text">Load ID</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Customer</span></div>
                                                 <div class="nk-tb-col tb-col-lg"><span class="sub-text">Commodity</span></div>
-                                                <div class="nk-tb-col tb-col-xxl"><span class="sub-text">From</span></div>
-                                                <div class="nk-tb-col tb-col-mb"><span class="sub-text">To</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Quantity</span></div>
-                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Issued</span></div>
-                                                <div class="nk-tb-col"><span class="sub-text">Status</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Quotation</span></div>
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1 my-n1">
                                                         <li>
@@ -254,29 +251,20 @@
                                                     </div>
                                                 </div>
                                                 <div class="nk-tb-col">
-                                                    <span>{{ load.load_id }}</span>
+                                                    <a href="{% url 'view_load' load.id  %}"><span>{{ load.load_id }}</span></a>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-md">
-                                                    <span>{{ load.customer.name}} </span>
+                                                    <span>{{ load.estimate.customer.name}} </span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-lg">
                                                     <span>{{ load.commodity }}</span>
                                                 </div>
-                                                <div class="nk-tb-col tb-col-xxl">
-                                                    <span>{{trip.load.shipper.address_one}}</span>
-                                                </div>
                                                 <div class="nk-tb-col tb-col-mb">
-                                                    <span>{{ trip.load.consignee.address_one}}</span>
+                                                    <span>{{ load.quantity }} {{ load.quantity_type}}</span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-md">
-                                                    <span>135</span>
-                                                </div>
-                                                <div class="nk-tb-col tb-col-md">
-                                                    <span>05</span>
-                                                </div>
-                                                <div class="nk-tb-col">
-                                                    <span class="tb-status text-success">Available</span>
-                                                </div>
+                                                    <a href="{% url 'view_estimate' load.estimate.id  %}"><span>{{ load.estimate }}</span></a>
+                                                </div>                                                
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1">
                                                         <li>

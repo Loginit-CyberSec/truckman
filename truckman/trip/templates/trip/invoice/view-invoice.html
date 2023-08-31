@@ -20,7 +20,7 @@
                             <h3 class="nk-block-title page-title">Invoice <strong class="text-primary small">#{{ invoice.invoice_id}}</strong></h3>
                             <div class="nk-block-des text-soft">
                                 <ul class="list-inline">
-                                    <li>Created At: <span class="text-base">{{ invoice.date_added }}</span></li>
+                                    <li>Created On: <span class="text-base">{{ invoice.invoice_date }}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -61,11 +61,11 @@
                                         <div class="invoice-contact">
                                             <span class="overline-title">Invoice To</span>
                                             <div class="invoice-contact-info">
-                                                <h4 class="title">{{ invoice.trip.load.customer.name }}</h4>
+                                                <h4 class="title">{{ invoice.trip.load.estimate.customer.name }}</h4>
                                                 <ul class="list-plain">
-                                                    <li><em class="icon ni ni-map-pin-fill"></em><span>{{ invoice.trip.load.customer.address_one }}, {{ invoice.trip.load.customer.city }}, {{ invoice.trip.load.customer.country }} </span></li>
-                                                    <li><em class="icon ni ni-mail"></em><span>{{ invoice.trip.load.customer.email }}</span></li>
-                                                    <li><em class="icon ni ni-call-fill"></em><span>{{ invoice.trip.load.customer.phone }}</span></li>
+                                                    <li><em class="icon ni ni-map-pin-fill"></em><span>{{ invoice.trip.load.estimate.customer.address_one }}, {{ invoice.trip.load.estimate.customer.city }}, {{ invoice.trip.load.estimate.customer.country }} </span></li>
+                                                    <li><em class="icon ni ni-mail"></em><span>{{ invoice.trip.load.estimate.customer.email }}</span></li>
+                                                    <li><em class="icon ni ni-call-fill"></em><span>{{ invoice.trip.load.estimate.customer.phone }}</span></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -76,7 +76,7 @@
                                         <h3 class="title">Invoice</h3>
                                         <ul class="list-plain">
                                             <li class="invoice-id"><span>Invoice ID</span>:<span>{{ invoice.invoice_id }}</span></li>
-                                            <li class="invoice-date"><span>Invoice Date</span>:<span>{{ invoice.date_added.date }}</span></li>
+                                            <li class="invoice-date"><span>Invoice Date</span>:<span>{{ invoice.invoice_date }}</span></li>
                                             <li class="invoice-date"><span>Date Due</span>:<span>{{ invoice.due_date }}</span></li>
                                         </ul>
                                     </div>
@@ -106,11 +106,11 @@
                                         <tbody>
                                             
                                             <tr>
-                                                <td>{{ invoice.trip.load.commodity }}</td>
-                                                <td>{{ invoice.service.description }}</td>
-                                                <td>${{ invoice.service.unit_price }}</td>
-                                                <td>{{ invoice.service.unit}}</td>
-                                                <td>${{ invoice.service.amount }}</td>
+                                                <td>{{ invoice.item }}</td>
+                                                <td>{{ invoice.description }}</td>
+                                                <td>${{ invoice.unit_price }}</td>
+                                                <td>{{ invoice.quantity}}</td>
+                                                <td>${{ invoice.sub_total }}</td>
                                             </tr>
                                         </tbody>
                                         <tfoot>
@@ -148,11 +148,7 @@
                                     </table>
                                     <div class="col-6">
                                         <h6 class="text-soft fs-11px">Payment Details:</h6>
-                                        {% if not company.invoice_payment_details %}
-                                        <span class="text-soft fs-11px">{{ company.invoice_payment_details }}</span>
-                                        {% else %}
                                         <span class="text-soft fs-11px">{{ invoice.note }}</span>
-                                        {% endif %}
                                     </div> <br>
                                     <div class="nk-notes ff-italic fs-12px text-soft"> Invoice was system generated and is valid without the signature and seal. </div>
                                 </div>

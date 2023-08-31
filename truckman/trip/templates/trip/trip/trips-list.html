@@ -224,10 +224,9 @@
                                                 <div class="nk-tb-col"><span class="sub-text">Trip ID</span></div>
                                                 <div class="nk-tb-col tb-col-md"><span class="sub-text">Driver</span></div>
                                                 <div class="nk-tb-col tb-col-lg"><span class="sub-text">Truck</span></div>
-                                                <div class="nk-tb-col tb-col-xxl"><span class="sub-text">From</span></div>
-                                                <div class="nk-tb-col tb-col-mb"><span class="sub-text">To</span></div>
-                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Quantity</span></div>
-                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Total Issued</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Pick up</span></div>
+                                                <div class="nk-tb-col tb-col-mb"><span class="sub-text">Drop off</span></div>
+                                                <div class="nk-tb-col tb-col-md"><span class="sub-text">Expected Delivery Date</span></div>
                                                 <div class="nk-tb-col"><span class="sub-text">Status</span></div>
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1 my-n1">
@@ -257,25 +256,28 @@
                                                     <span>{{ trip.trip_id }}</span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-md">
-                                                    <span>{{ trip.driver.first_name}} {{ trip.driver.last_name}}</span>
+                                                    <span>{{ trip.vehicle.driver.first_name}} {{ trip.driver.last_name}}</span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-lg">
                                                     <span>{{ trip.vehicle.plate_number }}</span>
                                                 </div>
-                                                <div class="nk-tb-col tb-col-xxl">
+                                                <div class="nk-tb-col tb-col-md">
                                                     <span>{{trip.load.shipper.address_one}}</span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-mb">
                                                     <span>{{ trip.load.consignee.address_one}}</span>
                                                 </div>
                                                 <div class="nk-tb-col tb-col-md">
-                                                    <span>135</span>
-                                                </div>
-                                                <div class="nk-tb-col tb-col-md">
-                                                    <span>05</span>
+                                                    <span>{{ trip.load.delivery_date }}</span>
                                                 </div>
                                                 <div class="nk-tb-col">
-                                                    <span class="tb-status text-success">Available</span>
+                                                    {% if trip.status == 'Not Started' %}
+                                                    <span class="tb-status text-secondary">{{ trip.status }}</span>
+                                                    {% elif trip.status == 'Dispatched' %}
+                                                    <span class="tb-status text-warning">{{ trip.status }}</span>
+                                                    {% elif trip.status == 'Completed' %}
+                                                    <span class="tb-status text-primary">{{ trip.status }}</span>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="nk-tb-col nk-tb-col-tools">
                                                     <ul class="nk-tb-actions gx-1">

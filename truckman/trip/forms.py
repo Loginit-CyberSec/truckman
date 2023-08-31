@@ -92,7 +92,7 @@ class DriverForm(forms.ModelForm):
     def __init__(self, *args, **kwargs): 
         company = kwargs.pop('company')# Get the company from kwargs
         super(DriverForm, self).__init__(*args, **kwargs)
-        self.fields['assigned_vehicle'].queryset = Vehicle.objects.filter(company=company)
+        self.fields['assigned_vehicle'].queryset = Vehicle.objects.filter(company=company, is_assigned_driver=False )
 
     class Meta:
         model = Driver
@@ -213,9 +213,10 @@ class LoadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company')# Get the company from kwargs
         super(LoadForm, self).__init__(*args, **kwargs)
-        self.fields['customer'].queryset = Customer.objects.filter(company=company) 
+        #self.fields['customer'].queryset = Customer.objects.filter(company=company) 
         self.fields['shipper'].queryset = Shipper.objects.filter(company=company) 
         self.fields['consignee'].queryset = Consignee.objects.filter(company=company) 
+        self.fields['estimate'].queryset = Estimate.objects.filter(company=company, status='Accepted') 
     
     class Meta:
         model = Load
@@ -223,20 +224,21 @@ class LoadForm(forms.ModelForm):
         exclude =['company', 'load_id', 'date_added']
 
         widgets = {
-                'customer': forms.Select(attrs={'class': 'form-select js-select2'}),
-                'shipper': forms.Select(attrs={'class': 'form-select js-select2'}),
+                #'customer': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'shipper': forms.Select(attrs={'class': 'form-select js-select2'}), 
                 'consignee': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'estimate': forms.Select(attrs={'class': 'form-select js-select2', 'id':'estimate'}),
                 #load details
                 'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800, weigh in Tons'}),
                 'pickup_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'delivery_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
-                'quantity':forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'quantity':forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'quantity_type':forms.Select(attrs={'class': 'form-select js-select2'}),
-                'commodity':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Maize Flour'}),
+                #'commodity':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Maize Flour'}),
                 'driver_instructions':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Fragile load, Drive with caution!'}),
                 #charges and fees
-                'primary_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                'primary_fee_type': forms.Select(attrs={'class': 'form-select js-select2'}),
+                #'primary_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
+                #'primary_fee_type': forms.Select(attrs={'class': 'form-select js-select2'}),
                 #'fuel_surcharge_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 #'fsc_amount_type': forms.Select(attrs={'class': 'form-select js-select2'}),
                 #'border_agent_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),

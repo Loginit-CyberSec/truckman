@@ -14,7 +14,8 @@ from .models import (
     Payment,
     Expense_Category,
     Expense,
-    Reminder
+    Reminder,
+    Load
 )
 
 # Register your models here.
@@ -33,3 +34,4 @@ admin.site.register(Payment)
 admin.site.register(Expense_Category)
 admin.site.register(Expense)
 admin.site.register(Reminder)
+admin.site.register(Load)

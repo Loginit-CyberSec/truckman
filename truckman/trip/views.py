@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Consignee, Shipper, Load, Trip
@@ -680,38 +680,34 @@ def add_load(request):
     #instantiate the two kwargs to be able to access them on the forms.py
     form = LoadForm(request.POST, company=company) 
     if request.method == 'POST':
+        '''
         customer_id = request.POST.get('customer')
         customer = Customer.objects.get(company=company, id=customer_id)
-
+        '''
         shipper_id = request.POST.get('shipper')
         shipper = Shipper.objects.get(company=company, id=shipper_id)
 
         consignee_id = request.POST.get('consignee')
         consignee = Consignee.objects.get(company=company, id=consignee_id)
 
-        #create instance of a driver
+        estimate_id = request.POST.get('estimate')
+        estimate = Estimate.objects.get(company=company, id=estimate_id)
+
+        #create instance of a load
         load = Load.objects.create(
             company=company,
-            customer = customer,
+            #customer = customer,
             shipper = shipper,
             consignee = consignee,
-            weight = request.POST.get('weight'),
-            pickup_date = request.POST.get('pickup_date'),
-            delivery_date = request.POST.get('delivery_date'),
+            estimate = estimate,
             quantity = request.POST.get('quantity'),
             quantity_type = request.POST.get('quantity_type'),
             commodity = request.POST.get('commodity'),
+            weight = request.POST.get('weight'),
+            quote_amount = request.POST.get('quoteAmount'),
+            pickup_date = request.POST.get('pickup_date'),
+            delivery_date = request.POST.get('delivery_date'),
             driver_instructions = request.POST.get('driver_instructions'),
-            primary_fee = request.POST.get('primary_fee'),
-            primary_fee_type = request.POST.get('primary_fee_type'),
-            fuel_surcharge_fee = request.POST.get('fuel_surcharge_fee'),
-            fsc_amount_type = request.POST.get('fsc_amount_type'),
-            border_agent_fee = request.POST.get('border_agent_fee'),
-            road_user = request.POST.get('road_user'),
-            gate_tolls = request.POST.get('gate_tolls'),
-            fines = request.POST.get('fines'),
-            additional_fees = request.POST.get('additional_fees'),
-            invoice_advance = request.POST.get('invoice_advance'),
             legal_disclaimer = request.POST.get('legal_disclaimer'),
             notes = request.POST.get('notes'),
         )
@@ -840,11 +836,10 @@ def add_trip(request):
         load_id = request.POST.get('load')
         load = Load.objects.get(company=company, id=load_id)
 
-
         vehicle_id = request.POST.get('vehicle')
         vehicle = Vehicle.objects.get(company=company, id=vehicle_id)
 
-        distance = int(request.POST.get('distance')) + 50
+        distance = int(request.POST.get('distance')) + 50 #use this to estimate the trip cost.
 
         #create instance of a trip
         trip = Trip.objects.create(
@@ -855,37 +850,45 @@ def add_trip(request):
             vehicle_odemeter = request.POST.get('vehicle_odemeter'),
             driver_advance = request.POST.get('driver_advance'),
             driver_milage = request.POST.get('driver_advance'),
-
             pick_up_location = request.POST.get('pick_up_location'),
             drop_off_location = request.POST.get('drop_off_location'),
             distance = distance,
         )
         description = f"Transport of {trip.load.commodity} from {trip.pick_up_location} to {trip.drop_off_location}, ({trip.distance}kms)"
-
-        service = Service.objects.create(
-            company=company,
-            name = trip.load.commodity,
-            description = description,
-            unit = request.POST.get('unit'),
-            unit_price = request.POST.get('unit_price'),
-            amount = request.POST.get('sub_total'),
-            tax = request.POST.get('tax')
-
-        )
-
+        invoice_date = timezone.now().date()
+        payment_term_days = load.estimate.customer.payment_term
+        if payment_term_days == '2 DAYS':
+            due_date = invoice_date + timedelta(days=2)
+        elif payment_term_days == '7 DAYS' or payment_term_days == 'Cash on Delivery':
+            due_date = invoice_date + timedelta(days=7)
+        elif payment_term_days == '10 DAYS':
+            due_date = invoice_date + timedelta(days=10)
+        elif payment_term_days == '15 DAYS':
+            due_date = invoice_date + timedelta(days=15)
+        elif payment_term_days == '30 DAYS':
+            due_date = invoice_date + timedelta(days=30)
+        
+        downpaymnet = load.estimate.customer.credit_limit / 100 * load.estimate.total
+        
+        #invoice note based on customer's credit limit and company payment details
+        note = f'Downpayment of {load.estimate.customer.credit_limit}% (${downpaymnet}). Pay to:{load.company.invoice_payment_details}'
         #generate a invoice instance
         invoice = Invoice.objects.create(
             company=company,
             trip = trip,
-            service = service,
-            sub_total = request.POST.get('sub_total'),
-            discount = request.POST.get('discount'),
-            tax = request.POST.get('tax'),
-            total = request.POST.get('total'),
-            balance = request.POST.get('total'),
-            invoice_date = request.POST.get('invoice_date'),
-            due_date = request.POST.get('due_date'),
-            note = request.POST.get('note'),
+            item = load.estimate.item,
+            quantity = load.estimate.quantity,
+            unit_price = load.estimate.unit_price,
+            description = description,
+            sub_total = load.estimate.sub_total,
+            tax = load.estimate.tax,
+            discount = load.estimate.discount,
+            total = load.estimate.total,
+            balance = load.estimate.total,
+            invoice_date = invoice_date,
+            due_date = due_date,
+            status = 'Unpaid',
+            note = note,
 
         )
 
@@ -956,15 +959,17 @@ def view_trip(request, pk):
     company=get_user_company(request)
     trip = Trip.objects.get(id=pk, company=company)
     expenses = Expense.objects.filter(company=company, trip=trip)
-    #invoice = Invoice.objects.get(company=company, trip=trip)
-   # payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
+    invoice = Invoice.objects.get(company=company, trip=trip)
+    payments = Payment.objects.filter(company=company, invoice=invoice) #invoice in invoices associated with the trip 
     form = ExpenseForm(request.POST, company=company) # for expense modal
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
     context={
+        'company':company,
         'trip':trip,
         'expenses':expenses,
-        #'payments':payments,
+        'invoice':invoice,
+        'payments':payments,
         'form':form,
         'category_form':category_form,
         'payment_form':payment_form
@@ -1021,6 +1026,51 @@ def add_payment(request):
 
         messages.success(request, f'Payment was added and receipt sent to the customer successfuly.')
         return redirect('view_invoice', invoice.id)
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/payment/payment-list.html', context)
+#--ends
+
+# add payment inside a trip
+def add_payment_trip(request, pk):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = PaymentForm(request.POST, company=company) 
+    if request.method == 'POST':
+
+        trip = Trip.objects.get(id=pk)
+        invoice = Invoice.objects.get(trip=trip)
+        amount = int(request.POST.get('amount'))
+
+        #create instance of a payment
+        payment = Payment.objects.create(
+            company=company,
+            transaction_id = request.POST.get('transaction_id'),
+            invoice = invoice,
+            amount = amount,
+            paid_on = request.POST.get('paid_on'),
+            payment_method = request.POST.get('payment_method'),
+            remark = request.POST.get('remark'),
+        )
+
+        #update invoice balance
+        invoice.balance = invoice.balance - amount
+
+        # Update invoice status
+        if invoice.balance <= 0:
+            invoice.status = 'Paid'
+        elif invoice.balance == invoice.total:
+            invoice.status = 'Unpaid'
+        else:
+            invoice.status = 'Partially Paid'
+        invoice.save()
+  
+        #send email to client
+
+        messages.success(request, f'Payment was added and receipt sent to the customer successfuly.')
+        return redirect('view_trip', trip.id)
 
     context= {
         'form':form,
@@ -1178,6 +1228,36 @@ def add_expense(request):
     return render(request, 'trip/expense/expense-list.html', context)
 #--ends
 
+# add expense inside a trip 
+def add_expense_trip(request, pk):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = ExpenseForm(request.POST, company=company) 
+    if request.method == 'POST':
+        trip = Trip.objects.get(id=pk)
+
+        expense_category_id = request.POST.get('expense_category')
+        expense_category = Expense_Category.objects.get(company=company, id=expense_category_id)
+
+        #create instance of a driver
+        expense = Expense.objects.create(
+            company=company,
+            trip = trip,
+            expense_category = expense_category,
+            amount = request.POST.get('amount'),
+            date_paid = request.POST.get('date_paid'),
+            paid_to = request.POST.get('paid_to'),
+            receipt = request.FILES.get('receipt'),
+        )
+
+        messages.success(request, f'Expense was added successfully.')
+        return redirect('view_trip', trip.id )
+
+    context= {
+        'form':form,
+    }
+    return render(request, 'trip/expense/expense-list.html', context)
+#--ends
 # update trip
 def update_expense(request, pk):
     company = get_user_company(request) #get request user company
@@ -1567,7 +1647,6 @@ def remove_reminder(request, pk):
 #---------------------------------- Reminder views------------------------------------------
 
 
-
 #---------------------------------- front end endpoint views -------------------------------------------------------------------------
 
 
@@ -1614,9 +1693,26 @@ def get_load_info(request, load_id):
     try:
         load = Load.objects.get(id=load_id, company=company)
         load_info = {
-            'customer': load.customer.name,
+            'customer': load.estimate.customer.name,
             'commodity': load.commodity,
         }
         return JsonResponse(load_info)
     except Load.DoesNotExist:
         return JsonResponse({'error': 'Load not found'}, status=404)
+    
+#--------------------------- estimate info ____________________________________________
+
+#view to get estimate info when adding an load
+def get_estimate_info(request, estimate_id):
+    company = get_user_company(request)
+    try:
+        estimate = Estimate.objects.get(id=estimate_id, company=company)
+        estimate_info = {
+            'amount': estimate.total,
+            'item': estimate.item,
+            'quantity': estimate.quantity,
+            'customer': estimate.customer.name,
+        }
+        return JsonResponse(estimate_info)
+    except Estimate.DoesNotExist:
+        return JsonResponse({'error': 'Estimate not found'}, status=404)

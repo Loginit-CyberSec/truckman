@@ -32,6 +32,66 @@
                                 <div class="card-inner">
                                     <div class="nk-block-head">
                                         <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Load & Trip info:</h5>
+                                            <p>Trip load details. </p>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="row gy-4">
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Load</label> 
+                                                    <div class="form-control-wrap">
+                                                        {{ form.load }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Commodity</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="commodity" class="form-control" id="commodity" value =" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Customer</label>
+                                                    <div class="form-control-wrap">
+                                                        <input type="text" name="customer" class="form-control" id="customer" value =" " readonly>
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Pick-up Location</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.pick_up_location }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Drop off</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.drop_off_location }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                            <div class="col-xxl-6 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Distance</label>
+                                                    <div class="form-control-wrap">
+                                                        {{ form.distance }}
+                                                    </div>
+                                                </div>
+                                            </div><!--col-->
+                                        </div><!--row-->
+                                    </div>
+                                </div><!-- .card-inner -->
+                                <div class="card-inner">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
                                             <h5 class="title nk-block-title">Truck:</h5>
                                             <p>Trip truck information. </p>
                                         </div>
@@ -103,66 +163,6 @@
                                                     </div>
                                                 </div>
                                             </div><!--col-->
-                                        </div><!--row-->
-                                    </div>
-                                </div><!-- .card-inner -->
-                                <div class="card-inner">
-                                    <div class="nk-block-head">
-                                        <div class="nk-block-head-content">
-                                            <h5 class="title nk-block-title">Load:</h5>
-                                            <p>Trip load details. </p>
-                                        </div>
-                                    </div>
-                                    <div class="nk-block">
-                                        <div class="row gy-4">
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Load</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.load }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Commodity</label>
-                                                    <div class="form-control-wrap">
-                                                        <input type="text" name="commodity" class="form-control" id="commodity" value ="{{ trip.load.commodity}}" readonly>
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Customer</label>
-                                                    <div class="form-control-wrap">
-                                                        <input type="text" name="customer" class="form-control" id="customer" value ="{{ trip.load.customer.name}}" readonly>
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Pick-up Location</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.pick_up_location }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Drop off</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.drop_off_location }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-xxl-6 col-md-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Distance</label>
-                                                    <div class="form-control-wrap">
-                                                        {{ form.distance }}
-                                                    </div>
-                                                </div>
-                                            </div><!--col-->
                                             <div class="col-12">
                                                 <div class="form-group">
                                                     <button type="submit" class="btn btn-primary">Add Trip</button>
@@ -171,6 +171,7 @@
                                         </div><!--row-->
                                     </div>
                                 </div><!-- .card-inner -->
+                                
                             </form>
                         </div>
                     </div><!-- .card -->
@@ -221,7 +222,6 @@
         loadSelect.on("change", function () {
             // Get the selected load ID
             var loadId = $(this).val();
-            console.log('This is the load id', loadId)
 
             // Send a GET request to fetch load  information
             $.get("/trip/get_load_info/" + loadId, function (data) {
