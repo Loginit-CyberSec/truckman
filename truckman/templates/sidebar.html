@@ -55,7 +55,7 @@
                     <div class="nk-sidebar-footer">
                         <ul class="nk-menu nk-menu-md apps-menu">
                             <li class="nk-menu-item">
-                                <a href="#" class="nk-menu-link" title="Settings">
+                                <a href="{% url 'global_settings' %}" class="nk-menu-link" title="Settings">
                                     <span class="nk-menu-icon"><em class="icon ni ni-setting"></em></span>
                                 </a>
                             </li>
@@ -65,14 +65,16 @@
                 <div class="nk-sidebar-profile nk-sidebar-profile-fixed">
                     <a href="#" class="toggle" data-target="profileDD">
                         <div class="user-avatar">
-                            <span>AB</span>
+                            <span>{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }} </span>
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-md m-1 nk-sidebar-profile-dropdown" data-content="profileDD">
                         <div class="dropdown-inner user-card-wrap d-none d-md-block">
                             <div class="user-card">
                                 <div class="user-avatar">
-                                    <span>AB</span>
+                                    {% if request.user.profile_photo %}
+                                    <img src="{{ request.user.profile_photo.url }}">
+                                    {% endif%}
                                 </div>
                                 <div class="user-info">
                                     <span class="lead-text">{{ request.user.first_name }} {{ request.user.last_name }}</span>
@@ -82,9 +84,8 @@
                         </div>
                         <div class="dropdown-inner">
                             <ul class="link-list">
-                                <li><a href="html/user-profile-regular.html"><em class="icon ni ni-user-alt"></em><span>View Profile</span></a></li>
-                                <li><a href="html/user-profile-setting.html"><em class="icon ni ni-setting-alt"></em><span>Account Setting</span></a></li>
-                                <li><a href="html/user-profile-activity.html"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li>
+                                <li><a href="{% url 'user_profile' request.user.id %}"><em class="icon ni ni-setting-alt"></em><span>My Account</span></a></li>
+                               <!-- <li><a href="html/user-profile-activity.html"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li> -->
                             </ul>
                         </div>
                         <div class="dropdown-inner">

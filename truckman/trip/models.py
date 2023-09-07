@@ -1,6 +1,6 @@
 from django.db import models
 from django.db import transaction
-from authentication.forms import Client
+from authentication.forms import Client, CustomUser
 
 #---------------------------------- Vehicle models ------------------------------------------
 #vehicle make/brand
@@ -366,14 +366,14 @@ class Trip(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL , null=True)
     vehicle_odemeter = models.BigIntegerField()
     #consider using google maps later
-    pick_up_location = models.CharField(null=True)
-    drop_off_location = models.CharField(null=True)
-    distance = models.CharField(null=True)
+    pick_up_location = models.CharField(null=True, max_length=150)
+    drop_off_location = models.CharField(null=True, max_length=150)
+    distance = models.FloatField(null=True)
     driver_accesory_pay = models.IntegerField(null=True)
     driver_advance = models.IntegerField(null=True)
     driver_milage = models.FloatField(null=True)
     date_added = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(default='Not Started', choices=TRIP_STATUS)
+    status = models.CharField(max_length=30, default='Not Started', choices=TRIP_STATUS)
 
     #generate customer_id 
     def save(self, *args, **kwargs):
@@ -549,3 +549,23 @@ class Reminder(models.Model):
 class Repair_Expenses(models.Model):
     pass
 '''
+#---------------------------------- Notification Model -----------------------------------------------   
+     
+STATES = (
+        ('warning', 'warning'),
+        ('success', 'success'),
+        ('danger', 'danger'),
+        ('info', 'info'),
+        ('stateless', 'stateless'),
+    )
+class Notification(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    state = models.CharField(max_length=50, choices=STATES, default='info')
+
+
+    def __str__(self):
+        return self.recipient.first_name

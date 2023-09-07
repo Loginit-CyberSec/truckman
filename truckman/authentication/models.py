@@ -23,8 +23,20 @@ class Client(models.Model):
     '''
     def __str__(self):
         return self.name
+    
+
+#--------------------------Preference model-----------------------------------------
+#client prefereces model
+class Preference(models.Model):
+    company = models.ForeignKey(Client, on_delete=models.CASCADE)
+    email_from_name = models.CharField(max_length=12, null=True) 
+    from_email = models.EmailField(null=True)
+    
+    def __str__(self):
+        return self.company.name
 
 #----------------------------Role model----------------------------------------------------
+
 #Role model
 
 class Role(models.Model):
@@ -61,5 +73,6 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=12, null=True)
     department = models.CharField(max_length=20, null=True)
     designation = models.CharField(max_length=30, null=True)
+    dark_mode = models.BooleanField(default=False)
 
 

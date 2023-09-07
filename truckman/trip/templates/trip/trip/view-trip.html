@@ -271,11 +271,16 @@
                                             <div class="nk-block nk-block-between">
                                                 <div class="nk-block-head">
                                                     <h6 class="title">Trip Invoice Information</h6>
-                                                    <p>Patients prescription information.</p>
                                                 </div><!-- .nk-block-head -->
                                                 <div class="nk-block">
+                                                    <a class="btn  btn-outline-primary" href="{% url 'send_trip_invoice' trip.id %}">
+                                                        <span>Send Invoice</span>
+                                                    </a>
                                                     <a class="btn  btn-primary" data-bs-toggle="modal" href="#addPayment">
                                                         <span>Add Payment</span>
+                                                    </a>
+                                                    <a class="btn  btn-outline-light"  href="{% url 'generate_invoice_pdf' trip.id %}">
+                                                        <span>Download</span>
                                                     </a>
                                                 </div>
                                             </div><!-- .nk-block-between  -->

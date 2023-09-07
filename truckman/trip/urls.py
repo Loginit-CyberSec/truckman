@@ -100,6 +100,10 @@ urlpatterns = [
     path('remove_invoice/<str:pk>', views.remove_invoice, name='remove_invoice'),
     path('view_invoice/<str:pk>', views.view_invoice, name='view_invoice'),
     path('list_invoices', views.list_invoices, name='list_invoices'),
+
+    path('send_trip_invoice/<str:pk>', views.send_trip_invoice, name='send_trip_invoice'),
+    path('generate_invoice_pdf/<str:pk>', views.generate_invoice_pdf, name='generate_invoice_pdf'),
+
     #--ends
 
     #estimate urls
@@ -108,6 +112,8 @@ urlpatterns = [
     path('remove_estimate/<str:pk>', views.remove_estimate, name='remove_estimate'),
     path('view_estimate/<str:pk>', views.view_estimate, name='view_estimate'),
     path('list_estimates', views.list_estimates, name='list_estimates'),
+
+    path('send_estimate/<str:pk>', views.send_estimate, name='send_estimate'),
     #--ends
 
     #reminder urls

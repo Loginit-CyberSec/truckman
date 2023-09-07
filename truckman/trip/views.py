@@ -1,9 +1,20 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required 
+from truckman.decorators import permission_required
 from django.utils import timezone
 from datetime import datetime, timedelta
+import os
+from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import Vehicle, Vehicle_Make, Vehicle_Model, Driver, Customer, Consignee, Shipper, Load, Trip
+from authentication.models import Preference
+
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+from premailer import transform
+from premailer import Premailer
+
 
 from . models import (
     Vehicle, 
@@ -42,13 +53,14 @@ from .forms import (
 )
 
 from truckman.utils import get_user_company
-
+from truckman.tasks import send_email_task
 
 
 
 
 #---------------------------------- Vehicle Make Views------------------------------------------
 # add vehicle make
+@login_required(login_url='login')
 def add_vehicle_make(request):
     company = get_user_company(request) #get request user company
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -70,6 +82,7 @@ def add_vehicle_make(request):
 
 #---------------------------------- Vehicle Model Views------------------------------------------
 # add vehicle model
+@login_required(login_url='login')
 def add_vehicle_model(request):
     company = get_user_company(request) #get request user company
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -94,6 +107,8 @@ def add_vehicle_model(request):
 
 #---------------------------------- Vehicle Views------------------------------------------
 # add vehicle
+@login_required(login_url='login')
+@permission_required('trip.add_vehicle')
 def add_vehicle(request):
     company = get_user_company(request) #get request user company
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -141,6 +156,8 @@ def add_vehicle(request):
 #--ends
 
 # update vehicle
+@login_required(login_url='login')
+@permission_required('trip.change_vehicle')
 def update_vehicle(request, pk):
     company = get_user_company(request) #get request user company
     vehicle = Vehicle.objects.get(id=pk, company=company)
@@ -204,6 +221,8 @@ def update_vehicle(request, pk):
 #--ends
 
 #vehicle list
+@login_required(login_url='login')
+@permission_required('trip.view_vehicle')
 def list_vehicles(request):
     vehicles = Vehicle.objects.filter(company=get_user_company(request))
     context = {'vehicles':vehicles}
@@ -211,6 +230,8 @@ def list_vehicles(request):
 #--ends
 
 #view vehicle
+@login_required(login_url='login')
+@permission_required('trip.view_vehicle')
 def view_vehicle(request, pk):
     vehicle = Vehicle.objects.get(id=pk, company=get_user_company(request))
     context={'vehicle':vehicle}
@@ -218,6 +239,8 @@ def view_vehicle(request, pk):
 #--ends
 
 # remove vehicle
+@login_required(login_url='login')
+@permission_required('trip.delete_vehicle')
 def remove_vehicle(request, pk):
     if request.method == 'POST':
         vehicle = Vehicle.objects.get(id=pk, company=get_user_company(request))
@@ -229,6 +252,8 @@ def remove_vehicle(request, pk):
 #---------------------------------- Driver views------------------------------------------
 
 # add driver
+@login_required(login_url='login')
+@permission_required('trip.add_driver')
 def add_driver(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -272,6 +297,8 @@ def add_driver(request):
 #--ends
 
 # update driver
+@login_required(login_url='login')
+@permission_required('trip.change_driver')
 def update_driver(request, pk):
     company = get_user_company(request) #get request user company
     driver = Driver.objects.get(id=pk, company=company)
@@ -340,6 +367,8 @@ def update_driver(request, pk):
 #--ends
 
 #drivers list
+@login_required(login_url='login')
+@permission_required('trip.view_driver')
 def list_drivers(request):
     drivers = Driver.objects.filter(company=get_user_company(request))
     number_of_driver = drivers.count()
@@ -351,6 +380,8 @@ def list_drivers(request):
 #--ends
 
 #view driver
+@login_required(login_url='login')
+@permission_required('trip.view_driver')
 def view_driver(request, pk):
     driver = Driver.objects.get(id=pk, company=get_user_company(request))
     context={'driver':driver}
@@ -358,6 +389,8 @@ def view_driver(request, pk):
 #--ends
 
 # remove driver
+@login_required(login_url='login')
+@permission_required('trip.delete_driver')
 def remove_driver(request, pk):
     if request.method == 'POST':
         driver = Driver.objects.get(id=pk, company=get_user_company(request))
@@ -369,6 +402,8 @@ def remove_driver(request, pk):
 #---------------------------------- Customer views------------------------------------------
 
 # add customer
+@login_required(login_url='login')
+@permission_required('trip.add_customer')
 def add_customer(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -399,6 +434,8 @@ def add_customer(request):
 #--ends
 
 # update customer
+@login_required(login_url='login')
+@permission_required('trip.change_customer')
 def update_customer(request, pk):
     company = get_user_company(request) #get request user company
     customer = Customer.objects.get(id=pk, company=company)
@@ -447,6 +484,8 @@ def update_customer(request, pk):
 #--ends
 
 #customers list
+@login_required(login_url='login')
+@permission_required('trip.view_customer')
 def list_customers(request):
     customers = Customer.objects.filter(company=get_user_company(request))
     number_of_customers = customers.count()
@@ -458,6 +497,8 @@ def list_customers(request):
 #--ends
 
 #view customer
+@login_required(login_url='login')
+@permission_required('trip.view_customer')
 def view_customer(request, pk):
     customer = Customer.objects.get(id=pk, company=get_user_company(request))
     context={'customer':customer}
@@ -465,6 +506,8 @@ def view_customer(request, pk):
 #--ends
 
 # remove customer
+@login_required(login_url='login')
+@permission_required('trip.delete_customer')
 def remove_customer(request, pk):
     if request.method == 'POST':
         customer = Customer.objects.get(id=pk, company=get_user_company(request))
@@ -475,6 +518,8 @@ def remove_customer(request, pk):
 
 #---------------------------------- Consignee views------------------------------------------
 # add consignee
+@login_required(login_url='login')
+@permission_required('trip.add_consignee')
 def add_consignee(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -503,6 +548,8 @@ def add_consignee(request):
 #--ends
 
 # update consignee
+@login_required(login_url='login')
+@permission_required('trip.change_consignee')
 def update_consignee(request, pk):
     company = get_user_company(request) #get request user company
     consignee = Consignee.objects.get(id=pk, company=company)
@@ -547,6 +594,8 @@ def update_consignee(request, pk):
 #--ends
 
 #consignees list
+@login_required(login_url='login')
+@permission_required('trip.view_consignee')
 def list_consignees(request):
     consignees = Consignee.objects.filter(company=get_user_company(request))
     number_of_consignees = consignees.count()
@@ -558,6 +607,8 @@ def list_consignees(request):
 #--ends
 
 #view consignee
+@login_required(login_url='login')
+@permission_required('trip.view_consignee')
 def view_consignee(request, pk):
     consignee = Consignee.objects.get(id=pk, company=get_user_company(request))
     context={'consignee':consignee}
@@ -565,6 +616,8 @@ def view_consignee(request, pk):
 #--ends
 
 # remove consignee
+@login_required(login_url='login')
+@permission_required('trip.delete_consignee')
 def remove_consignee(request, pk):
     if request.method == 'POST':
         consignee = Consignee.objects.get(id=pk, company=get_user_company(request))
@@ -575,6 +628,8 @@ def remove_consignee(request, pk):
 
 #---------------------------------- Shipper views------------------------------------------
 # add shipper
+@login_required(login_url='login')
+@permission_required('trip.add_shipper')
 def add_shipper(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -603,6 +658,8 @@ def add_shipper(request):
 #--ends
 
 # update shipper
+@login_required(login_url='login')
+@permission_required('trip.change_shipper')
 def update_shipper(request, pk):
     company = get_user_company(request) #get request user company
     shipper = Shipper.objects.get(id=pk, company=company)
@@ -647,6 +704,8 @@ def update_shipper(request, pk):
 #--ends
 
 #shippers list
+@login_required(login_url='login')
+@permission_required('trip.view_shipper')
 def list_shippers(request):
     shippers = Shipper.objects.filter(company=get_user_company(request))
     number_of_shippers = shippers.count()
@@ -658,6 +717,8 @@ def list_shippers(request):
 #--ends
 
 #view shipper
+@login_required(login_url='login')
+@permission_required('trip.view_shipper')
 def view_shipper(request, pk):
     shipper = Shipper.objects.get(id=pk, company=get_user_company(request))
     context={'shipper':shipper}
@@ -665,6 +726,8 @@ def view_shipper(request, pk):
 #--ends
 
 # remove shipper
+@login_required(login_url='login')
+@permission_required('trip.delete_shipper')
 def remove_shipper(request, pk):
     if request.method == 'POST':
         shipper = Shipper.objects.get(id=pk, company=get_user_company(request))
@@ -675,6 +738,8 @@ def remove_shipper(request, pk):
 
 #---------------------------------- Load views------------------------------------------
 # add load
+@login_required(login_url='login')
+@permission_required('trip.add_load')
 def add_load(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -720,6 +785,8 @@ def add_load(request):
 #--ends
 
 # update load
+@login_required(login_url='login')
+@permission_required('trip.change_load')
 def update_load(request, pk):
     company = get_user_company(request) #get request user company
     load = Load.objects.get(id=pk, company=company)
@@ -799,6 +866,8 @@ def update_load(request, pk):
 #--ends
 
 #loads list
+@login_required(login_url='login')
+@permission_required('trip.view_load')
 def list_loads(request):
     loads = Load.objects.filter(company=get_user_company(request))
     number_of_loads = loads.count()
@@ -810,6 +879,8 @@ def list_loads(request):
 #--ends
 
 #view load
+@login_required(login_url='login')
+@permission_required('trip.view_load')
 def view_load(request, pk):
     load = Load.objects.get(id=pk, company=get_user_company(request))
     context={'load':load}
@@ -817,6 +888,8 @@ def view_load(request, pk):
 #--ends
 
 # remove load
+@login_required(login_url='login')
+@permission_required('trip.delete_load')
 def remove_load(request, pk):
     if request.method == 'POST':
         load = Load.objects.get(id=pk, company=get_user_company(request))
@@ -827,6 +900,8 @@ def remove_load(request, pk):
 
 #---------------------------------- Trip views------------------------------------------
 # add trip
+@login_required(login_url='login')
+@permission_required('trip.add_trip')
 def add_trip(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -902,6 +977,8 @@ def add_trip(request):
 #--ends
 
 # update trip
+@login_required(login_url='login')
+@permission_required('trip.change_trip')
 def update_trip(request, pk):
     company = get_user_company(request) #get request user company
     trip = Trip.objects.get(id=pk, company=company)
@@ -944,6 +1021,8 @@ def update_trip(request, pk):
 #--ends
 
 #trip list
+@login_required(login_url='login')
+@permission_required('trip.view_trip')
 def list_trips(request):
     trips = Trip.objects.filter(company=get_user_company(request))
     number_of_trips = trips.count()
@@ -955,6 +1034,8 @@ def list_trips(request):
 #--ends
 
 #view trip
+@login_required(login_url='login')
+@permission_required('trip.view_trip')
 def view_trip(request, pk):
     company=get_user_company(request)
     trip = Trip.objects.get(id=pk, company=company)
@@ -978,6 +1059,8 @@ def view_trip(request, pk):
 #--ends
 
 # remove trip
+@login_required(login_url='login')
+@permission_required('trip.delete_trip')
 def remove_trip(request, pk):
     if request.method == 'POST':
         trip = Trip.objects.get(id=pk, company=get_user_company(request))
@@ -989,6 +1072,8 @@ def remove_trip(request, pk):
 #---------------------------------- Payment views------------------------------------------
 
 # add payment
+@login_required(login_url='login')
+@permission_required('trip.add_payment')
 def add_payment(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1034,6 +1119,8 @@ def add_payment(request):
 #--ends
 
 # add payment inside a trip
+@login_required(login_url='login')
+@permission_required('trip.add_payment')
 def add_payment_trip(request, pk):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1079,6 +1166,8 @@ def add_payment_trip(request, pk):
 #--ends
 
 # update trip
+@login_required(login_url='login')
+@permission_required('trip.change_payment')
 def update_payment(request, pk):
     company = get_user_company(request) #get request user company
     trip = Trip.objects.get(id=pk, company=company)
@@ -1124,6 +1213,8 @@ def update_payment(request, pk):
 #--ends
 
 #trip list
+@login_required(login_url='login')
+@permission_required('trip.view_payment')
 def list_payments(request):
     payments = Payment.objects.filter(company=get_user_company(request))
     form = PaymentForm(request.POST, company=get_user_company(request)) 
@@ -1135,6 +1226,8 @@ def list_payments(request):
 #--ends
 
 #view trip
+@login_required(login_url='login')
+@permission_required('trip.view_payment')
 def view_payment(request, pk):
     trip = Trip.objects.get(id=pk, company=get_user_company(request))
     context={'trip':trip}
@@ -1142,6 +1235,8 @@ def view_payment(request, pk):
 #--ends
 
 # remove trip
+@login_required(login_url='login')
+@permission_required('trip.delete_payment')
 def remove_payment(request, pk):
     if request.method == 'POST':
         trip = Trip.objects.get(id=pk, company=get_user_company(request))
@@ -1153,6 +1248,8 @@ def remove_payment(request, pk):
 #---------------------------------- Expense Category views------------------------------------------
 
 # add expense category
+@login_required(login_url='login')
+@permission_required('trip.add_expense_category')
 def add_expense_category(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1172,6 +1269,8 @@ def add_expense_category(request):
 
 
 #expense category list
+@login_required(login_url='login')
+@permission_required('trip.view_expense_category')
 def list_expenses_categories(request):
     expenses = Expense.objects.filter(company=get_user_company(request))
     form = ExpenseForm(request.POST, company=get_user_company(request)) 
@@ -1185,6 +1284,8 @@ def list_expenses_categories(request):
 #--ends
 
 # remove expense category
+@login_required(login_url='login')
+@permission_required('trip.delete_expense_category')
 def remove_expense_category(request, pk):
     if request.method == 'POST':
         trip = Trip.objects.get(id=pk, company=get_user_company(request))
@@ -1196,6 +1297,8 @@ def remove_expense_category(request, pk):
 #---------------------------------- Expense views------------------------------------------
 
 # add expense
+@login_required(login_url='login')
+@permission_required('trip.add_expense')
 def add_expense(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1229,6 +1332,8 @@ def add_expense(request):
 #--ends
 
 # add expense inside a trip 
+@login_required(login_url='login')
+@permission_required('trip.add_expense')
 def add_expense_trip(request, pk):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1258,7 +1363,10 @@ def add_expense_trip(request, pk):
     }
     return render(request, 'trip/expense/expense-list.html', context)
 #--ends
+
 # update trip
+@login_required(login_url='login')
+@permission_required('trip.change_expense')
 def update_expense(request, pk):
     company = get_user_company(request) #get request user company
     trip = Trip.objects.get(id=pk, company=company)
@@ -1304,6 +1412,8 @@ def update_expense(request, pk):
 #--ends
 
 #trip list
+@login_required(login_url='login')
+@permission_required('trip.view_expense')
 def list_expenses(request):
     expenses = Expense.objects.filter(company=get_user_company(request))
     form = ExpenseForm(request.POST, company=get_user_company(request)) 
@@ -1317,6 +1427,8 @@ def list_expenses(request):
 #--ends
 
 #view trip
+@login_required(login_url='login')
+@permission_required('trip.view_expense')
 def view_expense(request, pk):
     trip = Trip.objects.get(id=pk, company=get_user_company(request))
     context={'trip':trip}
@@ -1324,6 +1436,8 @@ def view_expense(request, pk):
 #--ends
 
 # remove trip
+@login_required(login_url='login')
+@permission_required('trip.delete_expense')
 def remove_expense(request, pk):
     if request.method == 'POST':
         trip = Trip.objects.get(id=pk, company=get_user_company(request))
@@ -1334,6 +1448,8 @@ def remove_expense(request, pk):
 
 #---------------------------------- Invoice views------------------------------------------
 # add invoice
+@login_required(login_url='login')
+@permission_required('trip.add_invoice')
 def add_invoice(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1381,6 +1497,8 @@ def add_invoice(request):
 #--ends
 
 # update trip
+@login_required(login_url='login')
+@permission_required('trip.change_invoice')
 def update_invoice(request, pk):
     company = get_user_company(request) #get request user company
     trip = Trip.objects.get(id=pk, company=company)
@@ -1426,6 +1544,8 @@ def update_invoice(request, pk):
 #--ends
 
 #trip list
+@login_required(login_url='login')
+@permission_required('trip.view_invoice')
 def list_invoices(request):
     invoices = Invoice.objects.filter(company=get_user_company(request))
     context = {
@@ -1435,6 +1555,8 @@ def list_invoices(request):
 #--ends
 
 #view trip
+@login_required(login_url='login')
+@permission_required('trip.view_invoice')
 def view_invoice(request, pk):
     company = get_user_company(request)
     invoice = Invoice.objects.get(id=pk, company=get_user_company(request))
@@ -1446,6 +1568,8 @@ def view_invoice(request, pk):
 #--ends
 
 # remove trip
+@login_required(login_url='login')
+@permission_required('trip.delete_invoice')
 def remove_invoice(request, pk):
     if request.method == 'POST':
         trip = Trip.objects.get(id=pk, company=get_user_company(request))
@@ -1454,9 +1578,83 @@ def remove_invoice(request, pk):
         return redirect('list_trips')
 #--ends
 
+#send trip invoice
+@login_required(login_url='login')
+@permission_required('trip.view_invoice') 
+def send_trip_invoice(request, pk):
+    company = get_user_company(request)
+    trip = Trip.objects.get(id=pk, company=company)
+    invoice = Invoice.objects.get(trip=trip)
+    preference = Preference.objects.get(company=company)
+
+    #having this context because delay() need model serialzation
+    context = {
+        'customer_name': trip.load.estimate.customer.name,
+        'invoice_pdf': 'pdf of the invoice' #invoice goes here
+        #'due_amount': loan.due_amount,
+        #'due_date': user_local_time(loan.company.timezone, loan.due_date).date(),
+        #'total_payable': loan.total_payable(),
+        #'tzone':company.timezone
+    }
+
+    from_name = preference.email_from_name
+    from_email = preference.from_email
+    template_path = 'trip/invoice/trip-invoice.html'
+    subject = 'Trip Invoice'
+    recipient_email = trip.load.estimate.customer.email
+    replyto_email = company.email
+
+    send_email_task.delay(
+        context, 
+        template_path, 
+        from_name, 
+        from_email, 
+        subject, 
+        recipient_email, 
+        replyto_email
+    )
+
+    messages.success(request, 'Invoice sent to customer.')
+    return redirect('view_trip', trip.id)
+
+# generate invoice pdf view 
+def generate_invoice_pdf(request, pk):
+    company = get_user_company(request)
+    trip = Trip.objects.get(id=pk, company=company)
+    invoice = Invoice.objects.get(trip=trip)
+    # Path to your HTML template.
+    template_path = 'trip/invoice/invoice-template.html'
+
+    # Load the HTML template using Django's get_template method.
+    template = get_template(template_path)
+    context = {
+        'company':company,
+        'invoice':invoice
+    }  # You can pass context data here if needed
+
+    # Render the template with the context data.
+    html = template.render(context)
+
+    # Create a response object with PDF content type.
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{invoice.invoice_id}.pdf"'
+
+    # Create a PDF object using xhtml2pdf's pisa.CreatePDF.
+    pdf = pisa.CreatePDF(html, dest=response)
+
+    # Check if PDF generation was successful.
+    if not pdf.err:
+        return response
+
+    # If PDF generation failed, return an error message.
+    return HttpResponse('PDF generation failed: %s' % pdf.err)
+
+
 #---------------------------------- Estimate views------------------------------------------
 
 # add estimate
+@login_required(login_url='login')
+@permission_required('trip.add_estimate')
 def add_estimate(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1492,6 +1690,8 @@ def add_estimate(request):
 #--ends
 
 # update estimate
+@login_required(login_url='login')
+@permission_required('trip.change_estimate')
 def update_estimate(request, pk):
     company = get_user_company(request) #get request user company
     estimate = Estimate.objects.get(id=pk, company=company)
@@ -1548,6 +1748,8 @@ def update_estimate(request, pk):
 #--ends
 
 #estimate list
+@login_required(login_url='login')
+@permission_required('trip.view_estimate')
 def list_estimates(request):
     estimates = Estimate.objects.filter(company=get_user_company(request))
     number_of_estimates = estimates.count()
@@ -1559,6 +1761,8 @@ def list_estimates(request):
 #--ends
 
 #view estimate
+@login_required(login_url='login')
+@permission_required('trip.view_estimate')
 def view_estimate(request, pk):
     company=get_user_company(request)
     estimate = Estimate.objects.get(id=pk, company=company)
@@ -1570,6 +1774,8 @@ def view_estimate(request, pk):
 #--ends
 
 # remove estimate
+@login_required(login_url='login')
+@permission_required('trip.delete_estimate')
 def remove_estimate(request, pk):
     if request.method == 'POST':
         estimate = Estimate.objects.get(id=pk, company=get_user_company(request))
@@ -1578,9 +1784,50 @@ def remove_estimate(request, pk):
         return redirect('list_estimates')
 #--ends
 
+#send estimate to client via email
+@login_required(login_url='login')
+@permission_required('trip.view_estimate') 
+def send_estimate(request, pk):
+    company = get_user_company(request)
+    estimate = Estimate.objects.get(id=pk, company=company)
+    preference = Preference.objects.get(company=company)
+
+    #having this context because delay() need model serialzation
+    context = {
+        'customer_name': estimate.customer.name,
+        'estimate_pdf': 'pdf of the estimate',
+        'company_name': company.name
+        #'due_amount': loan.due_amount,
+        #'due_date': user_local_time(loan.company.timezone, loan.due_date).date(),
+        #'total_payable': loan.total_payable(),
+        #'tzone':company.timezone
+    }
+
+    from_name = preference.email_from_name
+    from_email = preference.from_email
+    template_path = 'trip/estimate/load-estimate.html'
+    subject = 'Quotation'
+    recipient_email = estimate.customer.email
+    replyto_email = company.email
+
+    send_email_task.delay(
+        context, 
+        template_path, 
+        from_name, 
+        from_email, 
+        subject, 
+        recipient_email, 
+        replyto_email
+    )
+
+    messages.success(request, 'Estimate sent to customer.')
+    return redirect('view_estimate', estimate.id)
+
 #---------------------------------- Reminder views------------------------------------------
 
 # add reminder
+@login_required(login_url='login')
+@permission_required('trip.add_reminder')
 def add_reminder(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
@@ -1622,6 +1869,8 @@ def add_reminder(request):
 #--ends
 
 #reminder list
+@login_required(login_url='login')
+@permission_required('trip.view_reminder')
 def list_reminders(request):
     company = get_user_company(request)
     reminders = Reminder.objects.filter(company=company)
@@ -1636,6 +1885,8 @@ def list_reminders(request):
 #--ends
 
 # remove reminder
+@login_required(login_url='login')
+@permission_required('trip.delete_reminder')
 def remove_reminder(request, pk):
     #if request.method == 'POST':
     reminder = Reminder.objects.get(id=pk, company=get_user_company(request))
@@ -1647,11 +1898,12 @@ def remove_reminder(request, pk):
 #---------------------------------- Reminder views------------------------------------------
 
 
+
 #---------------------------------- front end endpoint views -------------------------------------------------------------------------
 
 
 # view to get trip info when adding an invoice
-
+@login_required(login_url='login')
 def get_trip_info(request, trip_id):
     company = get_user_company(request)
     try:
@@ -1667,7 +1919,7 @@ def get_trip_info(request, trip_id):
 #--------------------------- vehicle info ____________________________________________
 
 # view to get load info when adding a trip
-  
+@login_required(login_url='login')
 def get_vehicle_info(request, vehicle_id):
     company = get_user_company(request)
     try:
@@ -1688,6 +1940,7 @@ def get_vehicle_info(request, vehicle_id):
 #--------------------------- load info ____________________________________________
 
 #view to get load info when adding an trip
+@login_required(login_url='login')
 def get_load_info(request, load_id):
     company = get_user_company(request)
     try:
@@ -1703,6 +1956,7 @@ def get_load_info(request, load_id):
 #--------------------------- estimate info ____________________________________________
 
 #view to get estimate info when adding an load
+@login_required(login_url='login')
 def get_estimate_info(request, estimate_id):
     company = get_user_company(request)
     try:
@@ -1716,3 +1970,4 @@ def get_estimate_info(request, estimate_id):
         return JsonResponse(estimate_info)
     except Estimate.DoesNotExist:
         return JsonResponse({'error': 'Estimate not found'}, status=404)
+

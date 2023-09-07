@@ -21,4 +21,9 @@ urlpatterns = [
     path('view_staff/<str:pk>', views.view_staff, name='view_staff'), 
     path('update_staff/<str:pk>', views.update_staff, name='update_staff'), 
     path('remove_staff/<str:pk>', views.remove_staff, name='remove_staff'), 
+
+    #user urls
+    path('user_profile/<str:pk>', views.user_profile, name='user_profile'), 
+    path('update_user_profile/<str:pk>', views.update_user_profile, name='update_user_profile'), 
+    path('settings', views.global_settings, name='global_settings'), 
 ]

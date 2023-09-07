@@ -4,6 +4,37 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError  
 from .models import CustomUser, Client, Role
 from django.forms.widgets import CheckboxSelectMultiple
+from pytz import all_timezones
+from iso4217 import Currency
+import pycountry
+
+#-------------------- Client form -------------------------------------------------------------------
+class ClientForm(forms.ModelForm):
+    '''
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company')# Get the company from kwargs
+        super(StaffForm, self).__init__(*args, **kwargs)
+        self.fields['role'].queryset = Role.objects.filter(company=company) 
+    '''
+    class Meta:
+        model = Client
+        fields = '__all__'
+        
+
+        widgets = {
+                'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Enigma Trucks'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@loginit.co.ke'}),
+                'phone_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'0731733333'}),
+                #'timezone': forms.Select(attrs={'class': 'form-select js-select2'}), 
+                'date_joined': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
+                'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some address'}),
+                #'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
+                #'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
+                #'currency': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
+                'invoice_payment_details': forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Payment details...'}),
+                'logo': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+            }    
+
 
 #--------------------CustomUser form ---------------------------------------------
 class CustomUserCreationForm(forms.Form): 
@@ -59,7 +90,7 @@ class StaffForm(forms.ModelForm):
         widgets = {
                 'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Enigma'}),
                 'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Sesom'}),
-                'email': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'info@loginit.co.ke'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder':'info@loginit.co.ke'}),
                 'password': forms.PasswordInput(attrs={'class': 'form-control'}),
                 'role': forms.Select(attrs={'class': 'form-select js-select2'}), 
                 'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'254706000000'}),

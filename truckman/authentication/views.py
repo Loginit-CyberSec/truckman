@@ -1,9 +1,11 @@
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required 
+from truckman.decorators import permission_required 
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Permission
-from .forms import CustomUserCreationForm, StaffForm, RoleForm 
+from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm
 from .models import Client, CustomUser, Role
 from truckman.utils import get_user_company
 
@@ -72,6 +74,8 @@ def logout_user(request):
 
 #----------------- Role Views ---------------------------
 #add role view
+@login_required(login_url='login')
+@permission_required('authentication.add_role')
 def add_role(request):
     if request.method == 'POST':
         # Get all available permissions
@@ -102,10 +106,14 @@ def add_role(request):
     return render(request, 'authentication/role/roles-list.html')
 
 # update role  view
+@login_required(login_url='login')
+@permission_required('authentication.change_role')
 def update_role(request, pk):
     pass
 
 # role list view
+@login_required(login_url='login')
+@permission_required('authentication.view_role')
 def list_roles(request):
     company = get_user_company(request)
     roles = Role.objects.filter(company=company)
@@ -117,15 +125,21 @@ def list_roles(request):
     return render(request, 'authentication/role/roles-list.html', context)
 
 #  view role
+@login_required(login_url='login')
+@permission_required('authentication.view_role')
 def view_role(request, pk):
     pass
 
 #  remove role
+@login_required(login_url='login')
+@permission_required('authentication.delete_role')
 def remove_role(request, pk):
     pass
 
 #----------------- Staff Views ---------------------------
 #add staff view
+@login_required(login_url='login')
+@permission_required('authentication.add_customuser')
 def add_staff(request):
     company=get_user_company(request)
     form = StaffForm(request.POST, company=company)
@@ -163,6 +177,8 @@ def add_staff(request):
     return render(request, 'authentication/staff/staffs-list.html', context)
 
 # update staff  view
+@login_required(login_url='login')
+@permission_required('authentication.change_customuser')
 def update_staff(request, pk):
     company = get_user_company(request) 
     staff = CustomUser.objects.get(id=pk, company=company)
@@ -216,6 +232,8 @@ def update_staff(request, pk):
 # -- ends 
 
 # staff list view
+@login_required(login_url='login')
+@permission_required('authentication.view_customuser')
 def list_staffs(request):
     company = get_user_company(request)
     staffs = CustomUser.objects.filter(company=company)
@@ -227,9 +245,75 @@ def list_staffs(request):
     return render(request, 'authentication/staff/staffs-list.html', context)
 
 #  view staff
+@login_required(login_url='login')
+@permission_required('authentication.view_customuser')
 def view_staff(request, pk):
     pass
 
-#  remove staff
+#remove staff
+@login_required(login_url='login')
+@permission_required('authentication.delete_customuser')
 def remove_staff(request, pk):
     pass
+
+#----------------- User Views ---------------------------
+# user profile
+@login_required(login_url='login')
+def user_profile(request, pk):
+    company = get_user_company(request)
+    user = CustomUser.objects.get(id=pk)
+    
+    form_data = {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'phone': user.phone
+        }
+    
+    form = StaffForm(initial=form_data, company=company)
+
+    context = {
+        'form':form, 
+        'user':user    
+        }
+    return render(request, 'authentication/user/user-profile.html', context)
+
+# update user profile
+@login_required(login_url='login')
+def update_user_profile(request, pk):
+    company = get_user_company(request)
+    user = CustomUser.objects.get(id=pk)
+    if request.method == "POST":
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.phone = request.POST.get('phone')
+        user.save()
+
+        messages.success(request, 'Profile updated succesfully.')
+
+    return redirect('user_profile', user.id)
+    #return render(request, 'authentication/user/user-profile.html', context)
+
+# client global settings view
+@login_required(login_url='login')
+@permission_required('authentication.view_client')
+def global_settings(request):
+    company = get_user_company(request)
+    form = ClientForm(request.POST)
+    if request.method == 'POST':
+        company.name = request.POST.get('name')
+        company.address = request.POST.get('address')
+        company.phone_no = request.POST.get('phone_no')
+        company.invoice_payment_details = request.POST.get('invoice_payment_details')
+        company.save()
+
+    else:
+        form_data = {
+            'name':company.name,
+            'name':company.address,
+        }
+
+    context = {
+        'company':company,
+        'form':form,
+    }
+    return render(request, 'authentication/settings/settings.html', context)
