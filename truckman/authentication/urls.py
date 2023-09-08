@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
  
 
-urlpatterns = [
+urlpatterns = [ 
     #organization urls
     path('register', views.register_user, name='register'),
     path('login', views.login_user, name='login'), 
@@ -26,4 +26,9 @@ urlpatterns = [
     path('user_profile/<str:pk>', views.user_profile, name='user_profile'), 
     path('update_user_profile/<str:pk>', views.update_user_profile, name='update_user_profile'), 
     path('settings', views.global_settings, name='global_settings'), 
+
+    path('password_reset/<str:pk>/<str:token>', views.password_reset, name='password_reset'),
+    path('forgot_password', views.forgot_password, name='forgot_password'),
+    path('resetpass_email_send', views.resetpass_email_send, name='resetpass_email_send'),
+    path('render_reset_form', views.render_reset_form, name='render_reset_form'),
 ]

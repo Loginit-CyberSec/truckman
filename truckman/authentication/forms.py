@@ -53,7 +53,8 @@ class CustomUserCreationForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data['email'].lower()
         r = CustomUser.objects.filter(email=email)
-        if r.count():
+        l = Client.objects.filter(email=email)
+        if r.count() or l.count():
             raise  ValidationError("Email already exists")
         return email
 

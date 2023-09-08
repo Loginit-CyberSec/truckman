@@ -4,6 +4,7 @@ from truckman.decorators import permission_required
 from django.utils import timezone
 from datetime import datetime, timedelta
 import os
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
@@ -1583,7 +1584,8 @@ def remove_invoice(request, pk):
 @permission_required('trip.view_invoice') 
 def send_trip_invoice(request, pk):
     company = get_user_company(request)
-    trip = Trip.objects.get(id=pk, company=company)
+    trip = get_object_or_404(Trip, id=pk, company=company)
+    print(f'This is the trip id :{trip.trip_id}')
     invoice = Invoice.objects.get(trip=trip)
     preference = Preference.objects.get(company=company)
 
@@ -1605,7 +1607,7 @@ def send_trip_invoice(request, pk):
     replyto_email = company.email
 
     send_email_task.delay(
-        context, 
+        context,  
         template_path, 
         from_name, 
         from_email, 

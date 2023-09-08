@@ -2,14 +2,18 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required 
 from truckman.decorators import permission_required 
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.tokens import PasswordResetTokenGenerator 
+from django.conf import settings
+from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Permission
 from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm
 from .models import Client, CustomUser, Role
 from truckman.utils import get_user_company
+from truckman.tasks import send_email_task
 
-#----------------- User Views --------------------------
+#----------------- User Views -------------------------- 
 #sign up a user
 def register_user(request):
     if request.method == 'POST':
@@ -317,3 +321,106 @@ def global_settings(request):
         'form':form,
     }
     return render(request, 'authentication/settings/settings.html', context)
+
+#-- prompt user to enter email for resetting password
+def forgot_password(request):
+    return render(request,'authentication/user/reset-password.html')
+#--ends
+
+# Password reset token generator
+token_generator = PasswordResetTokenGenerator()
+
+#-- send change password instructions and link.
+def resetpass_email_send(request):
+    #get the user email from the POST request
+    if request.method == 'POST':
+        email = request.POST.get('email').lower()
+
+        #raise email/username do not exist in our database error
+        try:
+            user = CustomUser.objects.get(email=email)
+        except:
+            user = None
+            messages.error(request, 'This email does not exist in our database!')
+        if user is not None:
+            # Generate the password reset URL parameter user_id and token
+            reset_url = request.build_absolute_uri(reverse('password_reset', args=[user.id, token_generator.make_token(user)])) 
+
+            #send the user an email with instruction how to change password and a link 
+            context = {
+                "user":user.username,
+                "reset_url": reset_url
+                       }
+            send_email_task.delay(
+                context=context,
+                template_path='authentication/user/reset-instructions.html',
+                from_name='Loginit',
+                from_email=settings.EMAIL_HOST_USER,
+                subject='Loginit Password Reset',
+                recipient_email=email,
+                replyto_email=settings.EMAIL_HOST_USER
+            )
+            messages.success(request, 'Your request for a password reset has been received. Kindly check your email for further instructions.')
+    return render(request,'authentication/user/reset-password.html')
+#-- ends
+
+# reset password form
+def render_reset_form(request):
+    return render(request, 'authentication/user/reset-form.html')
+#-- ends
+
+# change password
+def password_reset(request, pk, token):
+    # Retrieve user based on id
+    try:
+        user = CustomUser.objects.get(id=pk)
+    except CustomUser.DoesNotExist:
+        user=None
+
+    if user is not None and token_generator.check_token(user, token):
+        if request.method == 'POST':
+            password1 = request.POST.get('password1')
+            password2 = request.POST.get('password2')
+            if password1 != password2:
+                messages.error(request, 'The passwords do not match! Try again.')
+            else:
+                # Check password strength
+                if len(password1) < 8:
+                    messages.error(request, 'Your password must be at least 8 characters long.')
+                elif password1.isdigit():
+                    messages.error(request, 'Your password must contain at least one letter.')
+                elif password1.isalpha():
+                    messages.error(request, 'Your password must contain at least one digit.')
+                else:
+                    # Hash the new password
+                    password = make_password(password1)
+                    user.password = password
+                    user.save()
+
+                    #send email to notify user their password was changed recently
+                    forgot_password_url = request.build_absolute_uri(reverse('forgot_password')) 
+                    context = {
+                        "user":user.username,
+                        "forgot_password_url": forgot_password_url
+                            }
+                    send_email_task.delay(
+                        context=context,
+                        template_path='authentication/user/reset-success-email.html',
+                        from_name='Loginit',
+                        from_email=settings.EMAIL_HOST_USER,
+                        subject='Your Loginit Truckman password has been updated',
+                        recipient_email=user.email,
+                        replyto_email=settings.EMAIL_HOST_USER
+                    )
+                    messages.success(request, 'Your password has been successfully reset.')
+                    return redirect('login')           
+    else:
+        messages.error(request, 'Invalid token!')
+        return redirect('forgot_password') 
+    context = {
+        "user":user,
+        "token":token
+    }
+    return render(request, 'authentication/user/password-reset-form.html', context)
+    
+#-- ends

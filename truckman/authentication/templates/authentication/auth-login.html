@@ -40,11 +40,11 @@
                                 </div>
                                 <!-- displaying flash messages -->
                                 {% if messages %}
-                                <ul class="alert alert-icon alert-danger" id="msg">
-                                    {% for message in messages %}
-                                    <li>{{ message }}</li>
-                                    {% endfor %}
-                                </ul>
+                                {% for message in messages %}
+                                    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
                                 {% endif %}
                                 <div class="nk-block-head">
                                     <div class="nk-block-head-content">

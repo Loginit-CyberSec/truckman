@@ -4,11 +4,11 @@
 <!-- content @s -->
 <!-- displaying flash messages -->
 {% if messages %}
-    <ul class="alert alert-icon alert-primary" id="msg">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
 {% endif %}
 <div class="nk-content ">
     <div class="container-fluid">
@@ -199,7 +199,7 @@
                                                             <div class="nk-block-actions flex-shrink-sm-0">
                                                                 <ul class="align-center flex-wrap flex-sm-nowrap gx-3 gy-2">
                                                                     <li class="order-md-last">
-                                                                        <a href="#" class="btn btn-primary">Change Password</a>
+                                                                        <a href="{% url 'forgot_password' %}" class="btn btn-primary">Reset Password</a>
                                                                     </li>
                                                                     <li>
                                                                         <em class="text-soft text-date fs-12px">Last changed: <span>Oct 2, 2019</span></em>
