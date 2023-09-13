@@ -9,8 +9,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Permission
 from .forms import CustomUserCreationForm, StaffForm, RoleForm, ClientForm
-from .models import Client, CustomUser, Role
-from truckman.utils import get_user_company
+from .models import Client, CustomUser, Role, Preference
+from truckman.utils import get_user_company, format_phone_number, deformat_phone_no
 from truckman.tasks import send_email_task
 
 #----------------- User Views -------------------------- 
@@ -297,31 +297,6 @@ def update_user_profile(request, pk):
     return redirect('user_profile', user.id)
     #return render(request, 'authentication/user/user-profile.html', context)
 
-# client global settings view
-@login_required(login_url='login')
-@permission_required('authentication.view_client')
-def global_settings(request):
-    company = get_user_company(request)
-    form = ClientForm(request.POST)
-    if request.method == 'POST':
-        company.name = request.POST.get('name')
-        company.address = request.POST.get('address')
-        company.phone_no = request.POST.get('phone_no')
-        company.invoice_payment_details = request.POST.get('invoice_payment_details')
-        company.save()
-
-    else:
-        form_data = {
-            'name':company.name,
-            'name':company.address,
-        }
-
-    context = {
-        'company':company,
-        'form':form,
-    }
-    return render(request, 'authentication/settings/settings.html', context)
-
 #-- prompt user to enter email for resetting password
 def forgot_password(request):
     return render(request,'authentication/user/reset-password.html')
@@ -369,7 +344,7 @@ def render_reset_form(request):
     return render(request, 'authentication/user/reset-form.html')
 #-- ends
 
-# change password
+# change password 
 def password_reset(request, pk, token):
     # Retrieve user based on id
     try:
@@ -413,7 +388,7 @@ def password_reset(request, pk, token):
                         replyto_email=settings.EMAIL_HOST_USER
                     )
                     messages.success(request, 'Your password has been successfully reset.')
-                    return redirect('login')           
+                    return redirect('home')           
     else:
         messages.error(request, 'Invalid token!')
         return redirect('forgot_password') 
@@ -424,3 +399,137 @@ def password_reset(request, pk, token):
     return render(request, 'authentication/user/password-reset-form.html', context)
     
 #-- ends
+
+#---------------------------------------- client settings views --------------------------------
+# client global settings view
+@login_required(login_url='login')
+@permission_required('authentication.view_client')
+def global_settings(request):
+    company = get_user_company(request)
+    preferences = Preference.objects.get(company=company)
+
+    #old_phone_code = organization.phone_code
+
+    if request.method == 'POST':
+        phone_no = request.POST.get('phone_no') 
+        phone_code = request.POST.get('phone_code') 
+        formatted_phone = format_phone_number(phone_no, phone_code)
+        #update company details
+        company.name = request.POST.get('name')
+        company.email = request.POST.get('email')
+        company.phone_no = formatted_phone
+        company.country = request.POST.get('country')
+        company.city = request.POST.get('city')
+        company.logo = request.FILES.get('logo')
+        company.address = request.POST.get('address')
+        company.invoice_payment_details = request.POST.get('invoice_payment_details')
+        company.currency = request.POST.get('currency')
+        company.timezone = request.POST.get('timezone')
+        company.phone_code = request.POST.get('phone_code')
+        company.save()
+
+        
+        messages.success(request, 'Preferences updated successfully')
+        return redirect('global_settings')
+    else:
+        # prepopulate the form with existing data
+        
+        #deformat phone number when displying on form
+        deheaded_phone = deformat_phone_no(company.phone_no, company.phone_code)
+        form_data = {
+            'name': company.name,
+            'email': company.email,
+            'country': company.country,
+            'city': company.city,
+            'phone_no': deheaded_phone, 
+            'logo': company.logo, 
+            'address': company.address,
+            'invoice_payment_details': company.invoice_payment_details,
+            'currency': company.currency,
+            'timezone': company.timezone,
+            'phone_code': company.phone_code,
+        }
+        '''
+        # prefill the sms form 
+        form_data_sms = {
+            'sender_id': sms_setting.sender_id,
+            'api_token': sms_setting.api_token,
+        }
+        # prefill the mpesa form 
+        form_data_mpesa = {
+            'shortcode': mpesa_setting.shortcode,
+            'app_consumer_key': mpesa_setting.app_consumer_key,
+            'app_consumer_secret': mpesa_setting.app_consumer_secret,
+            'online_passkey': mpesa_setting.online_passkey,
+            'username': mpesa_setting.username
+        }
+        # prefill the email form 
+        form_data_email = {
+            'from_name': email_setting.from_name,
+            'from_email': email_setting.from_email,
+            'smtp_host': email_setting.smtp_host,
+            'encryption': email_setting.encryption,
+            'smtp_port': email_setting.smtp_port,
+            'smtp_username': email_setting.smtp_username,
+            'smtp_password': email_setting.smtp_password
+        }
+        # prefill the system preference form 
+        form_data_preferences = {
+            'is_auto_disburse': preferences.is_auto_disburse,
+            'is_send_sms': preferences.is_send_sms,
+            'is_send_email': preferences.is_send_email,
+            'on_joining': preferences.on_joining,
+            'loan_pending': preferences.loan_pending,
+            'before_due_date': preferences.before_due_date,
+            'missed_payment': preferences.missed_payment,
+            'loan_rejected': preferences.loan_rejected,
+            'monthly_loan_statement': preferences.monthly_loan_statement,
+            'new_loan_products': preferences.new_loan_products,
+            'monthly_portfolio_performance': preferences.monthly_portfolio_performance,
+        }
+       '''
+        #form_preferences = PreferenceForm(initial=form_data_preferences)
+        #form_email = EmailSettingForm(initial=form_data_email)
+        #form_mpesa = MpesaSettingForm(initial=form_data_mpesa)
+        #form_sms = SmsForm(initial=form_data_sms)
+        form = ClientForm(initial=form_data)
+        context = {
+            'form':form,
+            #'form_sms':form_sms,
+            #'form_mpesa':form_mpesa,
+            #'form_email':form_email,
+            #'form_preferences':form_preferences,
+            'company':company,
+
+        }
+    return render(request, 'authentication/settings/settings.html', context)
+
+#change logo
+def change_logo(request): 
+    company = get_user_company(request)
+    if request.method == 'POST':
+        logo = request.FILES.get('logo')
+        company.logo = logo
+        company.save()
+        return redirect('global_settings')
+    
+    return redirect('global_settings')
+    
+def update_sms(request, pk):
+    pass
+
+def update_email(request, pk):
+    pass
+
+def send_test_email(request, pk):
+    pass
+
+def update_preferences(request, pk):
+    pass
+
+def disable_2fa(request, pk):
+    pass
+
+def enable_2fa(request, pk):
+    pass
+

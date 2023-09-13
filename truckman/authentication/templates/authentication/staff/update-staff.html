@@ -2,6 +2,12 @@
 
 {% block content %}
 <!-- content @s -->
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
 <div class="nk-content ">
     <div class="container-fluid">
         <div class="nk-content-inner">

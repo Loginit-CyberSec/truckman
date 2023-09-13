@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 
 
 # landing page or home 
-@login_required(login_url='login')
+@login_required(login_url='login') 
 def index_page(request): 
     context = {
         

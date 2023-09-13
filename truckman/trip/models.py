@@ -92,10 +92,10 @@ class Driver(models.Model):
     #dl and passport data
     dl_no = models.CharField(max_length=12)
     dl_issuing_authority = models.CharField(max_length=50, choices=DL_ISSUERER, null=True)
-    dl_front_img = models.ImageField(upload_to='driver_passports_dl/', null=True)
-    dl_back_img = models.ImageField(upload_to='driver_passports_dl/', null=True)
+    dl_front_img = models.FileField(upload_to='driver_passports_dl/', null=True)
+    dl_back_img = models.FileField(upload_to='driver_passports_dl/', null=True)
     passport_number = models.CharField(max_length=12)
-    passport_image = models.ImageField(upload_to='driver_passports_dl/', null=True)
+    passport_image = models.FileField(upload_to='driver_passports_dl/', null=True)
     # next of kin data
     emergency_contact_person = models.CharField(max_length=50, null=True, blank=True)
     emergency_contact_person_rlshp = models.CharField(max_length=30, choices=KIN_RLSHP, default='Spouse')

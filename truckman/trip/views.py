@@ -64,21 +64,16 @@ from truckman.tasks import send_email_task
 @login_required(login_url='login')
 def add_vehicle_make(request):
     company = get_user_company(request) #get request user company
-    #instantiate the two kwargs to be able to access them on the forms.py
-    #form = VehicleMakeForm(request.POST, company=company) 
+    
     if request.method == 'POST':
         #create instance of vehicle make
         vehicle_make = Vehicle_Make.objects.create(
             company=company,
             name = request.POST.get('name'),
         )
-
-        messages.success(request, f' {vehicle_make.name} was added successfully.')
-        return redirect('add_vehicle')
-
-    #redirect
-    #context= {'form':form}
-    return render(request, 'trip/vehicle-make/add-vehicle-make.html')
+        return JsonResponse({'success': True, 'make': {'id': vehicle_make.id, 'name': vehicle_make.name}})
+    else:
+        return JsonResponse({'success': False})
 #--ends
 
 #---------------------------------- Vehicle Model Views------------------------------------------
@@ -98,12 +93,15 @@ def add_vehicle_model(request):
             make=make
         )
 
-        messages.success(request, f' {vehicle_model.name} was added successfully.')
-        return redirect('add_vehicle')
+        #messages.success(request, f' {vehicle_model.name} was added successfully.')
+        #return redirect('add_vehicle')
+        return JsonResponse({'success': True, 'model': {'id': vehicle_model.id, 'name': vehicle_model.name}})
+    else:
+            return JsonResponse({'success': False})
 
     #redirect
-    context= {'form':form}
-    return render(request, 'trip/vehicle-model/add-vehicle-model.html', context)
+    #context= {'form':form}
+    #return render(request, 'trip/vehicle-model/add-vehicle-model.html', context)
 #--ends
 
 #---------------------------------- Vehicle Views------------------------------------------
@@ -1585,7 +1583,6 @@ def remove_invoice(request, pk):
 def send_trip_invoice(request, pk):
     company = get_user_company(request)
     trip = get_object_or_404(Trip, id=pk, company=company)
-    print(f'This is the trip id :{trip.trip_id}')
     invoice = Invoice.objects.get(trip=trip)
     preference = Preference.objects.get(company=company)
 

@@ -3,11 +3,11 @@
 {% block content %}
 <!-- displaying flash messages -->
 {% if messages %}
-<ul class="alert alert-icon alert-primary" id="msg">
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
+{% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
+        {{ message }}
+    </div>
+{% endfor %}
 {% endif %}
 <!-- content @s -->
 <div class="nk-content ">
@@ -61,7 +61,7 @@
                                         <div class="form-group">
                                             <label class="form-label"> Vehicle Make</label> <a data-bs-toggle="modal" href="#addVehicleMake" class="btn btn-sm btn-outline-primary"><span>Add Make</span><em class="icon ni ni-plus-sm"></em></a>
                                             <div class="form-control-wrap">
-                                                {{ form.make }}
+                                                {{ form.make }} 
                                             </div>
                                         </div>
                                     </div><!--col-->
@@ -242,7 +242,7 @@
             <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
             <div class="modal-body modal-body-md">
                 <h5 class="modal-title">Add Vehicle Make</h5>
-                <form action="{% url 'add_vehicle_make' %}" class="mt-4" method="POST">
+                <form action="{% url 'add_vehicle_make' %}" class="mt-4" method="POST" id="addVehicleMakeForm">
                     {% csrf_token %}
                     <div class="row g-gs">
                         <div class="col-md-6">
@@ -272,7 +272,7 @@
             <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
             <div class="modal-body modal-body-md">
                 <h5 class="modal-title">Add Vehicle Model</h5>
-                <form action="{% url 'add_vehicle_model' %}" class="mt-4" method="POST">
+                <form action="{% url 'add_vehicle_model' %}" class="mt-4" method="POST" id="addVehicleModelForm">
                     {% csrf_token %}
                     <div class="row g-gs">
                         <div class="col-md-6">
@@ -302,4 +302,93 @@
         </div><!-- .modal-content -->
     </div><!-- .modal-dialog -->
 </div><!-- .modal -->
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!--autofilling vehicle make-->
+<script>
+    $(document).ready(function() {
+        $('#addVehicleMakeForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle make
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var makeSelect = $('#vehicleMakeSelect');
+                        var newOption = $('<option>', {
+                            value: response.make.id,
+                            text: response.make.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        makeSelect.append(newOption).val(response.make.id);
+
+                        // Close the modal
+                        $('#addVehicleMake').modal('hide');
+
+                        // Clear the form fields
+                        $('#addVehicleMakeForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!--autofilling vehicle model-->
+<script>
+    $(document).ready(function() {
+        $('#addVehicleModelForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle model
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var modelSelect = $('#vehicleModelSelect');
+                        var newOption = $('<option>', {
+                            value: response.model.id,
+                            text: response.model.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        modelSelect.append(newOption).val(response.model.id);
+
+                        // Close the modal
+                        $('#addVehicleModel').modal('hide');
+
+                        // Clear the form fields
+                        $('#addVehicleModelForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
 {% endblock content %} 

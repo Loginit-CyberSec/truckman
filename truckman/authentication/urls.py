@@ -8,6 +8,16 @@ urlpatterns = [
     path('login', views.login_user, name='login'), 
     path('logout', views.logout_user, name='logout'), 
 
+    # organization preferences urls
+    path('settings', views.global_settings, name='global_settings'), 
+    path('sms/<str:pk>', views.update_sms, name='update_sms'),
+    path('email/<str:pk>', views.update_email, name='update_email'),
+    path('test-email/<str:pk>', views.send_test_email, name='test_email'),
+    path('preferences/<str:pk>', views.update_preferences, name='update_preferences'),
+    path('disable-2fa/<str:pk>', views.disable_2fa, name='disable_2fa'),
+    path('enable-2fa/<str:pk>', views.enable_2fa, name='enable_2fa'),
+    path('change_logo', views.change_logo, name='change_logo'), 
+
     #role urls
     path('add_role', views.add_role, name='add_role'),
     path('list_roles', views.list_roles, name='list_roles'), 
@@ -25,10 +35,10 @@ urlpatterns = [
     #user urls
     path('user_profile/<str:pk>', views.user_profile, name='user_profile'), 
     path('update_user_profile/<str:pk>', views.update_user_profile, name='update_user_profile'), 
-    path('settings', views.global_settings, name='global_settings'), 
+    
 
     path('password_reset/<str:pk>/<str:token>', views.password_reset, name='password_reset'),
     path('forgot_password', views.forgot_password, name='forgot_password'),
     path('resetpass_email_send', views.resetpass_email_send, name='resetpass_email_send'),
-    path('render_reset_form', views.render_reset_form, name='render_reset_form'),
+    path('render_reset_form', views.render_reset_form, name='render_reset_form'), 
 ]
