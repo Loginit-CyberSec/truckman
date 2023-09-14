@@ -232,23 +232,9 @@ class LoadForm(forms.ModelForm):
                 'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800, weigh in Tons'}),
                 'pickup_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'delivery_date': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
-                #'quantity':forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'quantity_type':forms.Select(attrs={'class': 'form-select js-select2'}),
-                #'commodity':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Maize Flour'}),
                 'driver_instructions':forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Fragile load, Drive with caution!'}),
-                #charges and fees
-                #'primary_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'primary_fee_type': forms.Select(attrs={'class': 'form-select js-select2'}),
-                #'fuel_surcharge_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'fsc_amount_type': forms.Select(attrs={'class': 'form-select js-select2'}),
-                #'border_agent_fee': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'road_user': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'gate_tolls': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'fines': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'additional_fees': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'invoice_advance': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
-                #'broker_commission': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'67800'}),
-                #others
+                
                 'legal_disclaimer': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some legal dissclaimer...'}),
                 'notes': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some notes/description about the load..'})
             }    
@@ -402,7 +388,7 @@ class ExpenseForm(forms.ModelForm):
         exclude =['company', 'expense_id' ]
 
         widgets = {
-                'expense_category': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'expense_category': forms.Select(attrs={'class': 'form-select js-select2', 'id':'expenseCategorySelect'}),
                 'trip': forms.Select(attrs={'class': 'form-select js-select2'}),
                 'amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),
                 'date_paid': forms.DateInput(attrs={'class': 'form-control  date-picker', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),

@@ -214,7 +214,9 @@
                                             </div>
                                         </div>
                                         <div class="nk-tb-col tb-col-mb">
+                                            {% if expense.trip %}
                                             <span class="fw-medium"><a href="{% url 'view_trip' expense.trip.id %}">#{{expense.trip.trip_id}}</a></span>
+                                            {% endif %}
                                         </div>
                                         <div class="nk-tb-col">
                                             <span>{{expense.expense_category.name}}</span>

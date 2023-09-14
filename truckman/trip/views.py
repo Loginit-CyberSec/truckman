@@ -1128,7 +1128,7 @@ def add_payment_trip(request, pk):
 
         trip = Trip.objects.get(id=pk)
         invoice = Invoice.objects.get(trip=trip)
-        amount = int(request.POST.get('amount'))
+        amount = float(request.POST.get('amount'))
 
         #create instance of a payment
         payment = Payment.objects.create(
@@ -1260,10 +1260,11 @@ def add_expense_category(request):
             company=company,
             name = request.POST.get('name')
         )
-        messages.success(request, f'Expense category was added successfully.')
-        return redirect('list_expenses')
 
-    return redirect('list_expenses')
+        return JsonResponse({'success': True, 'category': {'id': category.id, 'name': category.name}})
+    else:
+        return JsonResponse({'success': False})
+
 #--ends
 
 
@@ -1414,7 +1415,7 @@ def update_expense(request, pk):
 @login_required(login_url='login')
 @permission_required('trip.view_expense')
 def list_expenses(request):
-    expenses = Expense.objects.filter(company=get_user_company(request))
+    expenses = Expense.objects.filter(company=get_user_company(request)) 
     form = ExpenseForm(request.POST, company=get_user_company(request)) 
     category_form = ExpenseCategoryForm(request.POST)
     context = {

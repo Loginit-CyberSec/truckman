@@ -105,7 +105,7 @@
                                         {% for estimate in estimates %}
                                         <tr class="tb-odr-item">
                                             <td class="tb-odr-info">
-                                                <span class="tb-odr-id"><a href="html/pharmacy/invoice-details.html">#{{ estimate.estimate_id}}</a></span>
+                                                <span class="tb-odr-id"><a href="{% url 'view_estimate' estimate.id %}">#{{ estimate.estimate_id}}</a></span>
                                                 
                                             </td>
                                             <td class="tb-odr-amount">

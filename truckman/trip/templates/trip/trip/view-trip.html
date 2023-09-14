@@ -658,7 +658,7 @@
     </div>
 </div>
 <!-- content @e -->
-<!-- Add Expense-->
+<!-- Add Expense model-->
 <div class="modal fade" tabindex="-1" role="dialog" id="addExpense">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -743,7 +743,7 @@
             <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
             <div class="modal-body modal-body-md">
                 <h5 class="modal-title">Add Expense Category</h5>
-                <form action="{% url 'add_expense_category' %}" class="mt-4" method="POST">
+                <form action="{% url 'add_expense_category' %}" class="mt-4" method="POST" id="addExpenseCategoryForm">
                     {% csrf_token %}
                     <div class="row g-gs">
                         <div class="col-md-6">
@@ -796,7 +796,7 @@
                             <div class="form-group">
                                 <label class="form-label" for="category">Amount</label>
                                 <div class="form-control-wrap">
-                                    {{payment_form.amount}}
+                                    {{payment_form.amount}} 
                                 </div>
                             </div>
                         </div><!-- .col -->
@@ -841,4 +841,54 @@
         </div><!-- .modal-content -->
     </div><!-- .modal-dialog -->
 </div><!-- .modal -->
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!--autofilling expense category-->
+<script>
+    $(document).ready(function() {
+    $('#addExpenseCategoryForm').submit(function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Serialize the form data
+        var formData = $(this).serialize();
+
+        // Send an AJAX POST request to add the new expense category
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: formData,
+            success: function(response) {
+                // Check if the response indicates success
+                if (response.success) {
+                    var categorySelect = $('#expenseCategorySelect');
+                    var newOption = $('<option>', {
+                        value: response.category.id,
+                        text: response.category.name,
+                        selected: true // Set the option as selected
+                    });
+
+                    // Append the new option to the select and select it
+                    categorySelect.append(newOption).val(response.category.id);
+
+                    // Close the #addExpenseCategory modal
+                    $('#addExpenseCategory').modal('hide');
+
+                    // Clear the form fields
+                    $('#addExpenseCategoryForm')[0].reset();
+
+                    // Open the #addExpense modal with the selected option
+                    $('#addExpense').modal('show');
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                // Handle any errors here
+                console.error('Error:', errorThrown);
+            }
+        });
+    });
+});
+
+</script>
 {% endblock content %} 

@@ -48,11 +48,11 @@ class Vehicle(models.Model):
     purchase_year = models.DateField(null=True)
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='operational')
     notes = models.TextField(null=True, blank=True)
-    truck_image = models.ImageField(upload_to='vehicle_images/', null=True)
-    trailer_image = models.ImageField(upload_to='vehicle_images/', null=True)
-    truck_logbook = models.ImageField(upload_to='vehicle_images/', null=True)
-    trailer_logbook = models.ImageField(upload_to='vehicle_images/', null=True)
-    good_transit_licence  = models.ImageField(upload_to='vehicle_images/', null=True)
+    truck_image = models.FileField(upload_to='vehicle_images/', null=True)
+    trailer_image = models.FileField(upload_to='vehicle_images/', null=True)
+    truck_logbook = models.FileField(upload_to='vehicle_images/', null=True)
+    trailer_logbook = models.FileField(upload_to='vehicle_images/', null=True)
+    good_transit_licence  = models.FileField(upload_to='vehicle_images/', null=True)
     is_assigned_driver = models.BooleanField(default=False)
      
 
