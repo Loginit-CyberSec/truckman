@@ -62,7 +62,7 @@
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
                                                             <span class="profile-ud-label">Driver</span>
-                                                            <span class="profile-ud-value">{{ trip.vehicle.driver.first_name}} {{ driver.last_name}}</span>
+                                                            <span class="profile-ud-value">{{ driver.first_name}} {{ driver.last_name}}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
@@ -91,14 +91,14 @@
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Date Hired</span>
-                                                            <span class="profile-ud-value">{{ driver.date_hired }}</span>
+                                                            <span class="profile-ud-label">Customer</span>
+                                                            <span class="profile-ud-value">{{ trip.load.estimate.customer.name }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Date Terminated</span>
-                                                            <span class="profile-ud-value">{{ driver.date_terminated }}</span>
+                                                            <span class="profile-ud-label">Customer Phone</span>
+                                                            <span class="profile-ud-value">{{ trip.load.estimate.customer.phone }}</span>
                                                         </div>
                                                     </div>
                                                 </div><!-- .profile-ud-list -->
@@ -128,8 +128,8 @@
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Assigned Vehicle</span>
-                                                            <span class="profile-ud-value">{{driver.assigned_vehicle.plate_number }}</span>
+                                                            <span class="profile-ud-label">Shipper</span>
+                                                            <span class="profile-ud-value">{{trip.load.shipper.name }}</span>
                                                         </div>
                                                     </div>
                                                 </div><!-- .profile-ud-list -->
@@ -167,104 +167,574 @@
                                             </div><!-- .nk-block -->
                                         </div><!-- tab pane -->
                                         <div class="tab-pane" id="tabItem2">
-                                            <div class="nk-block nk-block-between">
-                                                <div class="nk-block-head">
-                                                    <h6 class="title">Documents</h6>
-                                                    <p>Trip documents.</p>
-                                                </div><!-- .nk-block-head -->
-                                                <div class="nk-block">
-                                                    <a class="btn btn-icon btn-primary" data-bs-toggle="modal" href="#addDiagnosis">
-                                                        <em class="icon ni ni-plus"></em>
-                                                    </a>
-                                                </div>
-                                            </div><!-- .nk-block-between  -->
                                             <div class="nk-block">
-                                                <div class="row g-gs">
-                                                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                                                        <div class="gallery card card-bordered">
-                                                            <a class="gallery-image popup-image" href="{{ trip.vehicle.truck_image.url }}">
-                                                                <img class="w-100 rounded-top" src="{{ trip.vehicle.truck_image.url }}" alt=""> 
-                                                            </a>
-                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
-                                                                <div class="user-card">
-                                                                    <div class="user-info">
-                                                                        <span class="lead-text">Truck Image</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                                                        <div class="gallery card card-bordered">
-                                                            <a class="gallery-image popup-image" href="{{ trip.vehicle.truck_logbook.url }}">
-                                                                <img class="w-100 rounded-top" src="{{ trip.vehicle.truck_logbook.url }}" alt=""> 
-                                                            </a>
-                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
-                                                                <div class="user-card">
-                                                                    <div class="user-info">
-                                                                        <span class="lead-text">Truck Logbook</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                                                        <div class="gallery card card-bordered">
-                                                            <a class="gallery-image popup-image" href="{{ trip.vehicle.trailer_image.url }}">
-                                                                <img class="w-100 rounded-top" src="{{ trip.vehicle.trailer_image.url }}" alt=""> 
-                                                            </a>
-                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
-                                                                <div class="user-card">
-                                                                    <div class="user-info">
-                                                                        <span class="lead-text">Trailer Image</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                                                        <div class="gallery card card-bordered">
-                                                            <a class="gallery-image popup-image" href="{{ trip.vehicle.trailer_logbook.url }}">
-                                                                <img class="w-100 rounded-top" src="{{ trip.vehicle.trailer_logbook.url }}" alt=""> 
-                                                            </a>
-                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
-                                                                <div class="user-card">
-                                                                    <div class="user-info">
-                                                                        <span class="lead-text">Truck Logbook</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                                                        <div class="gallery card card-bordered">
-                                                            <a class="gallery-image popup-image" href="{{ trip.vehicle.trailer_image.url }}">
-                                                                <img class="w-100 rounded-top" src="{{ trip.vehicle.trailer_image.url }}" alt=""> 
-                                                            </a>
-                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
-                                                                <div class="user-card">
-                                                                    <div class="user-info">
-                                                                        <span class="lead-text">Driver Image</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6 col-lg-4 col-xxl-3">
-                                                        <div class="gallery card card-bordered">
-                                                            <a class="gallery-image popup-image" href="{{ trip.vehicle.trailer_image.url }}">
-                                                                <img class="w-100 rounded-top" src="{{ trip.vehicle.trailer_image.url }}" alt=""> 
-                                                            </a>
-                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
-                                                                <div class="user-card">
-                                                                    <div class="user-info">
-                                                                        <span class="lead-text">Driver Image</span>
-                                                                    </div>
-                                                                </div>
+                                                <!-- content @s -->
+                                                <div class="nk-content ">
+                                                    <div class="container-fluid">
+                                                        <div class="nk-content-inner">
+                                                            <div class="nk-content-body">
+                                                                <div class="nk-block-head nk-block-head-sm">
+                                                                    <div class="nk-block-between">
+                                                                        <div class="nk-block-head-content">
+                                                                            <h3 class="nk-block-title page-title">Trip Documents</h3>
+                                                                            <div class="nk-block-des text-soft">
+                                                                                <p>This are all the trip related docs, from driver to load.</p>
+                                                                            </div>
+                                                                        </div><!-- .nk-block-head-content -->
+                                                                        <div class="nk-block-head-content">
+                                                                            <!-- <a href="html/hospital/patient-add.html" class="btn btn-icon btn-primary d-md-none"><em class="icon ni ni-plus"></em></a>
+                                                                            <a href="html/hospital/patient-add.html" class="btn btn-primary d-none d-md-inline-flex"><em class="icon ni ni-plus"></em><span>Add Document</span></a> -->
+                                                                            <a href="{% url 'send_to_shipper' trip.id %}" class="btn btn-primary d-none d-md-inline-flex" data-bs-toggle="tooltip" data-bs-placement="top" title="Send all to shipper as a single document."><em class="icon ni ni-send"></em><span>Send to Shipper</span></a>
+                                                                        </div><!-- .nk-block-head-content -->
+                                                                    </div><!-- .nk-block-between -->
+                                                                </div><!-- .nk-block-head -->
+                                                                <div class="nk-block">
+                                                                    <div class="card card-bordered card-stretch">
+                                                                        <div class="card-inner-group">
+                                                                            <div class="card-inner position-relative card-tools-toggle">
+                                                                                <div class="card-title-group">
+                                                                                    <div class="card-tools">
+                                                                                        <div class="form-inline flex-nowrap gx-3">
+                                                                                            <form method="POST" action="{% url 'docs_bulky_action' trip.id %}" id="bulk-action-form">
+                                                                                                {% csrf_token %}
+                                                                                                <div class="row gx-2 align-items-center">
+                                                                                                    <div class="col-auto">
+                                                                                                        <div class="form-wrap w-150px">
+                                                                                                            <select class="form-select js-select2" data-search="off" data-placeholder="Bulk Action" name="bulk-action" id="bulk-action-select">
+                                                                                                                <option value="">Bulk Action</option>
+                                                                                                                <option value="send">Send to Shipper</option>
+                                                                                                                <option value="share">Share</option>
+                                                                                                                <option value="download">Download</option>
+                                                                                                            </select>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col-auto">
+                                                                                                        <div class="btn-wrap">
+                                                                                                            <span class="d-none d-md-block">
+                                                                                                                <button type="submit" class="btn btn-dim btn-outline-light disabled" id="apply-btn">Apply</button>
+                                                                                                            </span>
+                                                                                                            <span class="d-md-none">
+                                                                                                                <button type="submit" class="btn btn-dim btn-outline-light disabled" id="apply-btn">Apply</button>
+                                                                                                            </span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </form>
+                                                                                        </div><!-- .form-inline -->
+                                                                                    </div><!-- .card-tools -->
+                                                                                    <div class="card-tools me-n1">
+                                                                                        <ul class="btn-toolbar gx-1">
+                                                                                            <li>
+                                                                                                <a href="#" class="btn btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                                                                                            </li><!-- li -->
+                                                                                           
+                                                                                            
+                                                                                        </ul><!-- .btn-toolbar -->
+                                                                                    </div><!-- .card-tools -->
+                                                                                </div><!-- .card-title-group -->
+                                                                                <div class="card-search search-wrap" data-search="search">
+                                                                                    <div class="card-body">
+                                                                                        <div class="search-content">
+                                                                                            <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                                                                                            <input type="text" class="form-control border-transparent form-focus-none" placeholder="Search by name or patient id">
+                                                                                            <button class="search-submit btn btn-icon"><em class="icon ni ni-search"></em></button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div><!-- .card-search -->
+                                                                            </div><!-- .card-inner -->
+                                                                            <div class="card-inner p-0">
+                                                                                <div class="nk-tb-list nk-tb-ulist">
+                                                                                    <div class="nk-tb-item nk-tb-head">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid">
+                                                                                                <label class="custom-control-label" for="uid"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col"><span class="sub-text">Document</span></div>
+                                                                                        <div class="nk-tb-col tb-col-sm"><span class="sub-text">Status</span></div>
+                                                                                        <div class="nk-tb-col tb-col-mb"><span class="sub-text">Category</span></div>
+                                                                                        <div class="nk-tb-col tb-col-mb"><span class="sub-text">Download</span></div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid1">
+                                                                                                <label class="custom-control-label" for="uid1"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Truck Logbook</span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if trip.vehicle.truck_logbook%}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Truck</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Truck logbook<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid10">
+                                                                                                <label class="custom-control-label" for="uid10"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Trailer Logbook</span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if trip.vehicle.trailer_logbook%}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Trailer</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Trailer logbook<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid2">
+                                                                                                <label class="custom-control-label" for="uid2"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Truck Image</span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if trip.vehicle.truck_image %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Truck</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Truck image<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid3">
+                                                                                                <label class="custom-control-label" for="uid3"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Trailer Image</span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if trip.vehicle.trailer_image %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Trailer</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Trailer Image<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid4">
+                                                                                                <label class="custom-control-label" for="uid4"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_vehicle' trip.vehicle.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Good Transit Licence</span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if trip.vehicle.good_transit_licence %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Trailer</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Good Transit Licence<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid5">
+                                                                                                <label class="custom-control-label" for="uid5"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_driver' driver.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Driver Photo</span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if driver.driver_photo %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                            
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Driver</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Driver Photo<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid6">
+                                                                                                <label class="custom-control-label" for="uid6"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_driver' driver.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Driver ID </span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if driver.id_img %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                            
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Driver</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Driver ID <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid7">
+                                                                                                <label class="custom-control-label" for="uid7"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_driver' driver.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Driver DL Front </span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if driver.dl_front_img %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                            
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Driver</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Driver DL Front <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid8">
+                                                                                                <label class="custom-control-label" for="uid8"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_driver' driver.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Driver DL Back </span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if driver.dl_back_img %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                            
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Driver</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Driver DL Back <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                    <div class="nk-tb-item">
+                                                                                        <div class="nk-tb-col nk-tb-col-check">
+                                                                                            <div class="custom-control custom-control-sm custom-checkbox notext">
+                                                                                                <input type="checkbox" class="custom-control-input" id="uid9">
+                                                                                                <label class="custom-control-label" for="uid9"></label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col">
+                                                                                            <a href="{% url 'view_driver' driver.id %}">
+                                                                                                <div class="user-card">
+                                                                                                    <div class="user-info">
+                                                                                                        <span class="tb-lead">Driver Passport </span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-sm">
+                                                                                            {% if driver.passport_image %}   
+                                                                                            <span class="fw-medium text-success">Uploaded</span>
+                                                                                            {% else %}
+                                                                                            <span class="fw-medium text-warning">Not Uploaded</span>
+                                                                                            {% endif %}
+                                                                                            
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <span>Driver</span>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col tb-col-mb">
+                                                                                            <ul class="list-inline list-download">
+                                                                                                <li>Driver Passport <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="nk-tb-col nk-tb-col-tools">
+                                                                                            <ul class="nk-tb-actions gx-1">
+                                                                                                <li class="nk-tb-action-hidden">
+                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                        <em class="icon ni ni-eye"></em>
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                                
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div><!-- .nk-tb-item -->
+                                                                                </div><!-- .nk-tb-list -->
+                                                                            </div><!-- .card-inner -->
+                                                                            <div class="card-inner">
+                                                                                <div class="nk-block-between-md g-3">
+                                                                                    <div class="g">
+                                                                                        <ul class="pagination justify-content-center justify-content-md-start">
+                                                                                            <li class="page-item"><a class="page-link" href="#">Prev</a></li>
+                                                                                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                                                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                                                            <li class="page-item"><span class="page-link"><em class="icon ni ni-more-h"></em></span></li>
+                                                                                            <li class="page-item"><a class="page-link" href="#">6</a></li>
+                                                                                            <li class="page-item"><a class="page-link" href="#">7</a></li>
+                                                                                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                                                                        </ul><!-- .pagination -->
+                                                                                    </div>
+                                                                                    <div class="g">
+                                                                                        <div class="pagination-goto d-flex justify-content-center justify-content-md-start gx-3">
+                                                                                            <div>Page</div>
+                                                                                            <div>
+                                                                                                <select class="form-select js-select2" data-search="on" data-dropdown="xs center">
+                                                                                                    <option value="page-1">1</option>
+                                                                                                    <option value="page-2">2</option>
+                                                                                                    <option value="page-4">4</option>
+                                                                                                    <option value="page-5">5</option>
+                                                                                                    <option value="page-6">6</option>
+                                                                                                    <option value="page-7">7</option>
+                                                                                                    <option value="page-8">8</option>
+                                                                                                    <option value="page-9">9</option>
+                                                                                                    <option value="page-10">10</option>
+                                                                                                    <option value="page-11">11</option>
+                                                                                                    <option value="page-12">12</option>
+                                                                                                    <option value="page-13">13</option>
+                                                                                                    <option value="page-14">14</option>
+                                                                                                    <option value="page-15">15</option>
+                                                                                                    <option value="page-16">16</option>
+                                                                                                    <option value="page-17">17</option>
+                                                                                                    <option value="page-18">18</option>
+                                                                                                    <option value="page-19">19</option>
+                                                                                                    <option value="page-20">20</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                            <div>OF 102</div>
+                                                                                        </div>
+                                                                                    </div><!-- .pagination-goto -->
+                                                                                </div><!-- .nk-block-between -->
+                                                                            </div><!-- .card-inner -->
+                                                                        </div><!-- .card-inner-group -->
+                                                                    </div><!-- .card -->
+                                                                </div><!-- .nk-block -->
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <!-- content @e -->
                                             </div><!-- .nk-block -->
                                         </div><!--tab pane-->
                                         <div class="tab-pane" id="tabItem3">
@@ -891,4 +1361,114 @@
 });
 
 </script>
+
+<!-- check/uncheck all checkboxes -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the "Select All" checkbox element
+        var selectAllCheckbox = document.getElementById("uid");
+
+        // Get all the individual checkboxes in the table
+        var individualCheckboxes = document.querySelectorAll(".custom-control-input");
+
+        // Add an event listener to the "Select All" checkbox
+        selectAllCheckbox.addEventListener("change", function() {
+            // Loop through all individual checkboxes and set their checked state
+            for (var i = 0; i < individualCheckboxes.length; i++) {
+                individualCheckboxes[i].checked = selectAllCheckbox.checked;
+            }
+        });
+    });
+</script>
+
+<!-- activate apply button & handle form submission -->
+<script>
+    $(document).ready(function() {
+        $('#bulk-action-select').change(function() {
+            var selectedOption = $(this).val();
+            var placeholderText = $(this).find('option:selected').text();
+
+            if (selectedOption !== "") {
+                $('#bulk-action-select').data('placeholder', placeholderText);
+                $('#apply-btn').removeClass('disabled').prop('disabled', false);
+            } else {
+                $('#bulk-action-select').data('placeholder', placeholderText);
+                $('#apply-btn').addClass('disabled').prop('disabled', true);
+            }
+        });
+
+        // handling form submission
+        $('#bulk-action-form').submit(function(event) {
+            event.preventDefault();
+
+            var checkedIds = [];
+            var selectedOption = $('#bulk-action-select').val();
+            $('.custom-control-input:checked').each(function() {
+                var docId= $(this).attr('id');
+                checkedIds.push(docId);
+            });
+
+            // Check if the selected option is 'sms'
+            if (selectedOption === 'share') {
+                // Open the modal for email input
+                $('#email-modal').modal('show'); //to refine this later
+            } else {
+                // Add the selected IDs as hidden inputs to the form
+                checkedIds.forEach(function(id) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'selected_ids',
+                        value: id
+                    }).appendTo('#bulk-action-form');
+                });
+
+                // Add the selected bulk action to the form
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'bulk-action',
+                    value: selectedOption
+                }).appendTo('#bulk-action-form');
+
+                // Submit the form
+                $(this).unbind('submit').submit();
+            }
+        });
+    });
+</script>
+
+<!-- Email Doc Modal Form -->
+<div class="modal fade" id="email-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Docs Via e-mail</h5>
+                <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <em class="icon ni ni-cross"></em>
+                </a>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'docs_bulky_action' trip.id%}" id="sms-modal-form" class="form-validate is-alter" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="template-select">Email</label>
+                        <div class="form-control-wrap">
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="sms-message-input">Subject</label>
+                        <div class="form-control-wrap">
+                            <textarea id="sms-message-input" class="form-control" name="subject" placeholder="Write your message.." required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-lg btn-primary">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal ends -->
+
 {% endblock content %} 

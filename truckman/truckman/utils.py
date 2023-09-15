@@ -2,9 +2,13 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string 
 import pytz
+import io
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.utils.timezone import localtime
 
 #utilies functions
-
+ 
 
 #get request user company
 def get_user_company(request):
@@ -28,6 +32,63 @@ def send_email(context, template_path, from_name, from_email, subject, recipient
     )
     e_mail.send(fail_silently=False)
 #--end
+
+#pdf invoice generator
+def generate_invoice_pdf(trip):
+    # Create an in-memory buffer to store the PDF
+    pdf_buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    c = canvas.Canvas(pdf_buffer, pagesize=letter)
+
+    # Set up some basic information on the PDF
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 750, f'Invoice ID: {invoice.invoice_id}')
+    c.drawString(100, 730, f'Trip Date: {localtime(trip.date).strftime("%Y-%m-%d %H:%M:%S")}')
+    c.drawString(100, 710, f'Customer: {trip.load.estimate.customer.name}')
+    c.drawString(100, 690, 'Items:')
+    
+    # Add invoice line items
+    y = 670
+    for item in invoice.items.all():
+        c.drawString(120, y, f'{item.description}')
+        c.drawString(300, y, f'Quantity: {item.quantity}')
+        c.drawString(400, y, f'Unit Price: ${item.unit_price}')
+        c.drawString(500, y, f'Total: ${item.total}')
+        y -= 20
+    
+    # Add total amount
+    c.drawString(100, y - 20, f'Total Amount: ${invoice.total_amount}')
+
+    # Save the PDF content
+    c.save()
+
+    # Move the buffer's cursor to the beginning
+    pdf_buffer.seek(0)
+
+    return pdf_buffer 
+
+#send email with attachement
+def send_email_with_attachment(context, template_path, from_name, from_email, subject, recipient_email, replyto_email, attachment_path):
+    # Build the email message
+    from_name_email = f'{from_name} <{from_email}>'
+    template = render_to_string(template_path, context)
+    e_mail = EmailMessage(
+        subject,
+        template,
+        from_name_email,  # 'John Doe <john.doe@example.com>'
+        [recipient_email],
+        reply_to=[replyto_email, from_email],
+    )
+    
+    # Attach an attachment
+    e_mail.attach_file(attachment_path)
+
+    try:
+        e_mail.send(fail_silently=False)
+    except Exception as e:
+        # Handle email sending failure
+        print(f"Email sending failed: {str(e)}")
     
 #format phone number to 254706384073
 def format_phone_number(phone_no, phone_code):

@@ -79,11 +79,11 @@ class VehicleForm(forms.ModelForm):
                 'manufacture_year': forms.DateInput(attrs={'class': 'form-control  date-picker-range', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'purchase_year': forms.DateInput(attrs={'class': 'form-control  date-picker-range', 'data-date-format':'yyyy-mm-dd', 'placeholder':'yyyy-mm-dd'}),
                 'notes': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'cf-default-textarea' ,'placeholder':'Notes...'}),
-                'truck_image': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
-                'trailer_image': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
-                'truck_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
-                'trailer_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
-                'good_transit_licence': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile'}),
+                'truck_image': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile', 'required':True}),
+                'trailer_image': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile', 'required':True}),
+                'truck_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile', 'required':True}),
+                'trailer_logbook': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile', 'required':True}),
+                'good_transit_licence': forms.FileInput(attrs={'class': 'form-file-input', 'id': 'customFile', 'required':True}),
             } 
         
 #---------------------------------- Driver forms ------------------------------------------

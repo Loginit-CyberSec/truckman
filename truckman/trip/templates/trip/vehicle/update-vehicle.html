@@ -1,7 +1,6 @@
 {% extends 'base.html' %}  
 
 {% block content %}
-<!-- content @s -->
 <!-- displaying flash messages -->
 {% if messages %}
 {% for message in messages %}
@@ -10,6 +9,7 @@
     </div>
 {% endfor %}
 {% endif %}
+<!-- content @s -->
 <div class="nk-content ">
     <div class="container-fluid">
         <div class="nk-content-inner">
@@ -17,7 +17,7 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title">Update Vehicle</h3>
+                            <h3 class="nk-block-title page-title">Update Vehicle</h3>  
                             <div class="nk-block-des text-soft">
                                 <p>Update vehicle details.</p>
                             </div>
@@ -27,9 +27,15 @@
                 <div class="nk-block">
                     <div class="card card-bordered">
                         <div class="card-inner">
-                            <form action=" " method="POST" enctype="multipart/form-data" >
+                            <form action="{% url 'update_vehicle' vehicle.id %}" method="POST" enctype="multipart/form-data" >
                                 {% csrf_token %}
                                 <div class="row gy-4">
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title">Basic Details:</h5>
+                                            <p>Update truck head and trailer basic detials. </p>
+                                        </div>
+                                    </div>
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label" for="name">Plate Number</label>
@@ -53,17 +59,25 @@
                                     </div><!--col-->
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Make</label>
+                                            <label class="form-label"> Vehicle Make</label> <a data-bs-toggle="modal" href="#addVehicleMake" class="btn btn-sm btn-outline-primary"><span>Add Make</span><em class="icon ni ni-plus-sm"></em></a>
                                             <div class="form-control-wrap">
-                                                {{ form.make }}
+                                                {{ form.make }} 
                                             </div>
                                         </div>
                                     </div><!--col-->
                                     <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Model</label>
+                                            <label class="form-label">Model</label> <a data-bs-toggle="modal" href="#addVehicleModel" class="btn btn-sm btn-outline-primary"><span>Add Model</span><em class="icon ni ni-plus-sm"></em></a>
                                             <div class="form-control-wrap">
                                                 {{ form.model }}
+                                            </div>
+                                        </div>
+                                    </div><!--col-->
+                                    <div class="col-xxl-3 col-md-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Color</label>
+                                            <div class="form-control-wrap">
+                                                {{ form.color }}
                                             </div>
                                         </div>
                                     </div><!--col-->
@@ -130,19 +144,7 @@
                                             </div>
                                         </div>
                                     </div><!--col-->
-                                    <div class="col-xxl-3 col-md-4"> 
-                                        <div class="form-group">
-                                            <label class="form-label" for="customFileLabel">Vehicle Image</label>
-                                            <div class="form-control-wrap">
-                                                <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
-                                                    {{ form.image }}
-                                                    <label class="form-file-label" for="customFile">Choose file</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
+                                    <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label" for="default-02">Vehicle Details</label>
                                             <div class="form-control-wrap">
@@ -150,10 +152,76 @@
                                                 {{ form.notes }}
                                             </div>
                                         </div>
-                                    </div><!--col-->
+                                    </div><!--col--> <br>
+                                    <div class="nk-block-head">
+                                        <div class="nk-block-head-content">
+                                            <h5 class="title nk-block-title"> Vehicle Images & Documents:</h5>
+                                            <p>Update truck head and trailer images and other required documents. </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Truck Head Image</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.truck_image }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Trailer Image</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.trailer_image }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Truck Logbook</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.truck_logbook }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Trailer Logbook</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.trailer_logbook }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-md-4"> 
+                                        <div class="form-group">
+                                            <label class="form-label" for="customFileLabel">Good Transit Licence</label>
+                                            <div class="form-control-wrap">
+                                                <div class="form-file">
+                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
+                                                    {{ form.good_transit_licence }}
+                                                    <label class="form-file-label" for="customFile">Choose file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-12">
                                         <div class="form-group">
-                                            <button type="submit" class="btn btn-primary">Update Vehicle</button>
+                                            <button type="submit" class="btn btn-primary">Save</button>
                                         </div>
                                     </div><!--col-->
                                 </div><!--row-->
@@ -166,4 +234,161 @@
     </div>
 </div>
 <!-- content @e -->
+
+<!-- Add Vehicle Make modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addVehicleMake">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Vehicle Make</h5>
+                <form action="{% url 'add_vehicle_make' %}" class="mt-4" method="POST" id="addVehicleMakeForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleMake">Make Name</label> 
+                                <div class="form-control-wrap">
+                                    {{ vehicle_form.name }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Vehicle Make</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Add Vehicle Model modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="addVehicleModel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            <div class="modal-body modal-body-md">
+                <h5 class="modal-title">Add Vehicle Model</h5>
+                <form action="{% url 'add_vehicle_model' %}" class="mt-4" method="POST" id="addVehicleModelForm">
+                    {% csrf_token %}
+                    <div class="row g-gs">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Vehicle Make</label> 
+                                <div class="form-control-wrap">
+                                    {{ vehicle_model_form.make }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="vehicleModel">Model Name</label> 
+                                <div class="form-control-wrap">
+                                    {{ vehicle_model_form.name }}
+                                </div>
+                            </div>
+                        </div><!-- .col -->
+                        <div class="col-12">
+                            <ul class="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                                <button type="submit" class="btn btn-primary">Add Vehicle Model</button>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- .modal-body -->
+        </div><!-- .modal-content -->
+    </div><!-- .modal-dialog -->
+</div><!-- .modal -->
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!--autofilling vehicle make-->
+<script>
+    $(document).ready(function() {
+        $('#addVehicleMakeForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle make
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var makeSelect = $('#vehicleMakeSelect');
+                        var newOption = $('<option>', {
+                            value: response.make.id,
+                            text: response.make.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        makeSelect.append(newOption).val(response.make.id);
+
+                        // Close the modal
+                        $('#addVehicleMake').modal('hide');
+
+                        // Clear the form fields
+                        $('#addVehicleMakeForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
+
+<!--autofilling vehicle model-->
+<script>
+    $(document).ready(function() {
+        $('#addVehicleModelForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX POST request to add the new vehicle model
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Check if the response indicates success
+                    if (response.success) {
+                        var modelSelect = $('#vehicleModelSelect');
+                        var newOption = $('<option>', {
+                            value: response.model.id,
+                            text: response.model.name,
+                            selected: true // Set the option as selected
+                        });
+
+                        // Append the new option to the select and select it
+                        modelSelect.append(newOption).val(response.model.id);
+
+                        // Close the modal
+                        $('#addVehicleModel').modal('hide');
+
+                        // Clear the form fields
+                        $('#addVehicleModelForm')[0].reset();
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Handle any errors here
+                    console.error('Error:', errorThrown);
+                }
+            });
+        });
+    });
+</script>
 {% endblock content %} 

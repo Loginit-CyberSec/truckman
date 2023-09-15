@@ -9,12 +9,17 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from authentication.models import Preference
-
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from premailer import transform
 from premailer import Premailer
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import pdfencrypt
+from reportlab.pdfgen import canvas
+from PyPDF2 import PdfMerger, PdfReader
+from PIL import Image
+import io
 
 
 from . models import (
@@ -53,8 +58,8 @@ from .forms import (
     EstimateForm
 )
 
-from truckman.utils import get_user_company
-from truckman.tasks import send_email_task
+from truckman.utils import get_user_company, generate_invoice_pdf
+from truckman.tasks import send_email_task, send_email_with_attachment_task
 
 
 
@@ -202,6 +207,7 @@ def update_vehicle(request, pk):
             'make': vehicle.make,
             'model': vehicle.model,
             'milage': vehicle.milage,
+            'color':vehicle.color,
             'milage_unit': vehicle.milage_unit,
             'insurance_expiry': vehicle.insurance_expiry,
             'manufacture_year': vehicle.manufacture_year,
@@ -216,7 +222,11 @@ def update_vehicle(request, pk):
         }
 
         form = VehicleForm(initial=form_data, company=company )
-        return render(request,'trip/vehicle/update-vehicle.html',{'form':form})
+        context = {
+            'form':form,
+            'vehicle':vehicle
+        }
+        return render(request,'trip/vehicle/update-vehicle.html',context)
 #--ends
 
 #vehicle list
@@ -1044,9 +1054,13 @@ def view_trip(request, pk):
     form = ExpenseForm(request.POST, company=company) # for expense modal
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
+    vehicle = trip.vehicle
+    if vehicle.is_assigned_driver:
+        driver = Driver.objects.get(assigned_vehicle=vehicle)        
     context={
         'company':company,
         'trip':trip,
+        'driver':driver,
         'expenses':expenses,
         'invoice':invoice,
         'payments':payments,
@@ -1056,6 +1070,134 @@ def view_trip(request, pk):
     }
     return render(request, 'trip/trip/view-trip.html', context)
 #--ends
+
+#send all trip document to shipper
+@login_required(login_url='login')
+@permission_required('trip.view_trip')
+def send_to_shipper(request, pk):
+    company = get_user_company(request)
+    trip = Trip.objects.get(id=pk, company=company)
+    shipper = trip.load.shipper
+    vehicle = trip.vehicle
+    driver = Driver.objects.get(assigned_vehicle=vehicle)
+
+    # Create a PDF file with all trip documents
+    merger = PdfMerger()
+
+    all_trip_documents = [
+        trip.vehicle.truck_logbook,
+        trip.vehicle.trailer_logbook,
+        trip.vehicle.truck_image,
+        trip.vehicle.trailer_image, 
+        trip.vehicle.good_transit_licence,
+        driver.driver_photo,
+        driver.id_img,
+        driver.dl_front_img,
+        driver.dl_back_img,
+        driver.passport_image
+    ]
+
+    for document in all_trip_documents:
+        # Check the file extension to determine the document type
+        file_extension = os.path.splitext(document.name)[1].lower()
+
+        if file_extension == ".pdf":
+            # If the document is already a PDF, add it directly to the merger
+            pdf_reader = PdfReader(open(document.path, 'rb'))
+            merger.append(pdf_reader)
+        elif file_extension in (".png", ".jpg", ".jpeg"):
+            # If the document is an image (PNG or JPG), convert it to PDF using PIL
+            image = Image.open(document.path)
+            pdf_buffer = io.BytesIO()
+            image.save(pdf_buffer, "PDF")
+            pdf_buffer.seek(0)
+
+            # Create a temporary PDF file for the converted image
+            temp_pdf_path = f"temp_image.pdf"
+            with open(temp_pdf_path, "wb") as temp_pdf_file:
+                temp_pdf_file.write(pdf_buffer.read())
+
+            # Open the temporary PDF and add it to the merger
+            pdf_reader = PdfReader(open(temp_pdf_path, 'rb'))
+            merger.append(pdf_reader)
+            
+            # Remove the temporary PDF file
+            os.remove(temp_pdf_path)
+
+    # Save the merged PDF to a file or send it by email
+    merged_pdf_path = f"merged_trip_documents.pdf"
+    merger.write(open(merged_pdf_path, 'wb'))
+    merger.close()
+
+
+
+    #send email
+    context = {
+        'company':company.name,
+        'shipper':shipper.name,
+        
+    }
+    send_email_with_attachment_task(
+        context=context, 
+        template_path='trip/trip/trip-docs-email.html', 
+        from_name=company.name, 
+        from_email=company.email, 
+        subject="All Trip Documents", 
+        recipient_email=shipper.email, 
+        replyto_email=company.email,
+        attachment_path=merged_pdf_path,  # Attach the merged PDF doc
+    )
+
+    messages.success(request, 'Documents sent to the shipper successfully')
+    return redirect('view_trip', trip.id)
+
+#trip docs bulky action view 
+def docs_bulky_action(request, pk):
+    company=get_user_company(request)
+    if request.method == 'POST':
+        # Retrieve the selected option from the form data
+        bulk_action = request.POST.get('bulk-action')
+        print(f'Selected action {bulk_action}')
+        selected_ids = request.POST.getlist('selected_ids')
+        selected_docs = []
+        trip = Trip.objects.get(id=pk)
+
+        if bulk_action == 'share':
+            #send as email to provided email
+            print('i got here. insdie share code command')
+            pdf_documents = []
+            context = {
+                'company':company.name,
+                'pdf_documents':pdf_documents
+            }
+            email = request.POST.get('email')
+            subject = request.POST.get('subject')
+            send_email_task(
+                context=context, 
+                template_path='trip/trip/share-doc-email.html', 
+                from_name=company.name, 
+                from_email=company.email, 
+                subject=subject, 
+                recipient_email=email, 
+                replyto_email=company.email
+            )
+            print('step three')
+            messages.success(request, 'Messages sent.')
+            return redirect('view_trip', trip.id)
+
+        elif bulk_action == 'send':
+            #send selected docs to shipper
+            print('step four')
+            messages.success(request, 'Sent to shipper.')
+            return redirect('view_trip', trip.id)
+        
+        elif bulk_action == 'download':
+            #download selected docs
+            print('step five')
+            messages.success(request, 'Documents downloading...')
+            return redirect('view_trip', trip.id)
+
+    return redirect('view_trip', trip.id)
 
 # remove trip
 @login_required(login_url='login')
@@ -1590,28 +1732,19 @@ def send_trip_invoice(request, pk):
     #having this context because delay() need model serialzation
     context = {
         'customer_name': trip.load.estimate.customer.name,
-        'invoice_pdf': 'pdf of the invoice' #invoice goes here
-        #'due_amount': loan.due_amount,
-        #'due_date': user_local_time(loan.company.timezone, loan.due_date).date(),
-        #'total_payable': loan.total_payable(),
-        #'tzone':company.timezone
     }
 
-    from_name = preference.email_from_name
-    from_email = preference.from_email
-    template_path = 'trip/invoice/trip-invoice.html'
-    subject = 'Trip Invoice'
-    recipient_email = trip.load.estimate.customer.email
-    replyto_email = company.email
+    pdf_invoice = generate_invoice_pdf(trip)
 
-    send_email_task.delay(
-        context,  
-        template_path, 
-        from_name, 
-        from_email, 
-        subject, 
-        recipient_email, 
-        replyto_email
+    send_email_with_attachment_task.delay(
+        context=context,  
+        template_path='trip/invoice/trip-invoice.html', 
+        from_name=preference.email_from_name, 
+        from_email=preference.from_email, 
+        subject=f'Trip Invoice:{invoice.invoice_id}', 
+        recipient_email=trip.load.estimate.customer.email, 
+        replyto_email=company.email,
+        attachment_path=invoice_path
     )
 
     messages.success(request, 'Invoice sent to customer.')

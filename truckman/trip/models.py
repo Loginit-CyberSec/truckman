@@ -77,7 +77,7 @@ KIN_RLSHP = (
     ('Father','FATHER'),
     ('Other','OTHER'),
 )
-class Driver(models.Model):
+class Driver(models.Model): 
     #personal data
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=12)

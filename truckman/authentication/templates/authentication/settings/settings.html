@@ -713,60 +713,65 @@
 <!-- content @e -->
 
 <!-- change company logo -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const logoInput = document.getElementById("logoInput");
-    const changeLogoButton = document.getElementById("changeLogoButton");
+    $(document).ready(function() {
+        const logoInput = $("#logoInput");
+        const changeLogoButton = $("#changeLogoButton");
 
-    changeLogoButton.addEventListener("click", function() {
-        // Trigger the file input click event
-        logoInput.click();
-    });
+        changeLogoButton.click(function(e) {
+            e.preventDefault(); // Prevent the default behavior of the anchor
+            // Trigger the file input click event
+            logoInput.click();
+        });
 
-    logoInput.addEventListener("change", function() {
-        // Check if a file has been selected
-        if (logoInput.files.length > 0) {
-            const formData = new FormData();
-            formData.append("logo", logoInput.files[0]);
+        logoInput.change(function() {
+            // Check if a file has been selected
+            if (logoInput[0].files.length > 0) {
+                const formData = new FormData();
+                formData.append("logo", logoInput[0].files[0]);
 
-            // Make an AJAX request to the 'change_logo' URL
-            fetch("{% url 'change_logo' %}", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken"), // Replace with your CSRF token retrieval method
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response data (e.g., success or error message)
-                console.log(data);
-                // Reload the page to reflect the logo change
-                window.location.reload();
-            })
-            .catch(error => {
-                // Handle errors
-                console.error(error);
-            });
-        }
-    });
+                // Make an AJAX request to the 'change_logo' URL
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'change_logo' %}",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"), // Replace with your CSRF token retrieval method
+                    },
+                    success: function(data) {
+                        // Handle the response data (e.g., success or error message)
+                        console.log(data);
+                        // Reload the page to reflect the logo change
+                        window.location.reload();
+                    },
+                    error: function(error) {
+                        // Handle errors
+                        console.error(error);
+                    }
+                });
+            }
+        });
 
-    // Function to get the CSRF token (replace with your own implementation)
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === name + "=") {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+        // Function to get the CSRF token (replace with your own implementation)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
+            return cookieValue;
         }
-        return cookieValue;
-    }
-});
+    });
 </script>
+
 
 {% endblock %}
