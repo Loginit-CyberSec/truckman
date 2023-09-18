@@ -319,21 +319,34 @@ def update_driver(request, pk):
         driver.tel_home = request.POST.get('tel_home')
         driver.tel_roam = request.POST.get('tel_roam')
         driver.date_hired = request.POST.get('date_hired')
-        driver.driver_photo = request.FILES.get('driver_photo')
-        driver.id_img = request.FILES.get('id_img')
 
         driver.dl_no = request.POST.get('dl_no')
         driver.passport_number = request.POST.get('passport_number')
         driver.dl_issuing_authority = request.POST.get('dl_issuing_authority')
-        driver.dl_front_img = request.FILES.get('dl_front_img')
-        driver.dl_back_img = request.FILES.get('dl_back_img')
-        driver.passport_image = request.FILES.get('passport_image')
+        
        
         driver.emergency_contact_person = request.POST.get('emergency_contact_person')
         driver.emergency_contact_person_rlshp = request.POST.get('emergency_contact_person_rlshp')
         driver.emergency_contact_no = request.POST.get('emergency_contact_no')
         driver.emergency_contact_two = request.POST.get('emergency_contact_two')
         driver.assigned_vehicle = assigned_vehicle
+
+        # Check if new images/files are provided
+        if request.FILES.get('driver_photo'):
+            driver.driver_photo = request.FILES.get('driver_photo')
+
+        if request.FILES.get('id_img'):
+            driver.id_img = request.FILES.get('id_img')
+
+        if request.FILES.get('dl_front_img'):
+            driver.dl_front_img = request.FILES.get('dl_front_img')
+
+        if request.FILES.get('dl_back_img'):
+            driver.dl_back_img = request.FILES.get('dl_back_img')
+
+        if request.FILES.get('passport_image'):
+            driver.passport_image = request.FILES.get('passport_image')
+
         driver.save()
         
         messages.success(request, f'Driver details edited successfully.')
@@ -347,16 +360,9 @@ def update_driver(request, pk):
             'tel_home': driver.tel_home,
             'tel_roam': driver.tel_roam,
             'date_hired': driver.date_hired,
-            'driver_photo': driver.driver_photo,
-            'id_img': driver.id_img,
-
             'dl_no': driver.dl_no,
             'passport_number': driver.passport_number,
-            'dl_issuing_authority':driver.dl_issuing_authority,
-            'dl_front_img':driver.dl_front_img,
-            'dl_back_img':driver.dl_back_img,
-            'passport_image':driver.passport_image,
-            
+            'dl_issuing_authority': driver.dl_issuing_authority,
             'emergency_contact_person': driver.emergency_contact_person,
             'emergency_contact_person_rlshp': driver.emergency_contact_person_rlshp,
             'emergency_contact_no': driver.emergency_contact_no,

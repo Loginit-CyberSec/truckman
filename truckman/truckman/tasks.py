@@ -3,7 +3,7 @@ from .utils import send_email, send_email_with_attachment
 
 @shared_task
 def hello_engima():
-    print('Developed by Loginit Engineers!!')
+    print('Developed by Loginit Engineers!!') 
 
 @shared_task
 def send_email_task(context, template_path, from_name, from_email, subject, recipient_email, replyto_email):

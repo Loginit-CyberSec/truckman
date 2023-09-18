@@ -524,7 +524,7 @@ def resetpass_email_send(request):
                 from_name='Loginit',
                 from_email=settings.EMAIL_HOST_USER,
                 subject='Loginit Password Reset',
-                recipient_email=email,
+                recipient_email=user.email,
                 replyto_email=settings.EMAIL_HOST_USER
             )
             messages.success(request, 'Your request for a password reset has been received. Kindly check your email for further instructions.')
