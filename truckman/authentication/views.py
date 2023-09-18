@@ -329,6 +329,26 @@ def add_staff(request):
         #assign staff role permissions
         staff.user_permissions.add(*permissions)
 
+        #send email
+        context = {
+            'first_name':staff.first_name,
+            'last_name':staff.last_name,
+            'username':staff.username,
+            'passcode':request.POST.get('password'),
+            'company_name':staff.company.name,
+            'role':staff.role.name
+            }
+        preference = Preference.objects.get(company=company)
+        send_email_task.delay(
+                context=context,
+                template_path='authentication/user/staff-welcome.html',
+                from_name=preference.email_from_name,
+                from_email=preference.from_email,  
+                subject=f'Staff Credentials',
+                recipient_email=staff.email,
+                replyto_email=preference.from_email 
+            )
+
         messages.success(request, f'{staff.first_name} added as staff.')
         return redirect('list_staffs')
     context= {
@@ -408,7 +428,12 @@ def list_staffs(request):
 @login_required(login_url='login')
 @permission_required('authentication.view_customuser')
 def view_staff(request, pk):
-    pass
+    company = get_user_company(request)
+    staff = CustomUser.objects.get(id=pk, company=company)
+    context = {
+        'staff':staff,
+    }
+    return render(request, 'authentication/staff/view-staff.html', context)
 
 #remove staff
 @login_required(login_url='login')

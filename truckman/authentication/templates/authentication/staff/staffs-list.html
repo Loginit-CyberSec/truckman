@@ -65,7 +65,7 @@
                                         <li><span>Email</span><span>{{ staff.email }}</span></li>
                                     </ul>
                                     <div class="team-view">
-                                        <a href="#" class="btn btn-block btn-dim btn-primary"><span>View Profile</span></a>
+                                        <a href="{% url 'view_staff' staff.id %}" class="btn btn-block btn-dim btn-primary"><span>View Profile</span></a>
                                     </div>
                                 </div><!-- .team -->
                             </div><!-- .card-inner -->
