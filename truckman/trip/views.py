@@ -510,7 +510,7 @@ def update_customer(request, pk):
         # Check if new images/files are provided
         if request.FILES.get('logo'):
             customer.logo = request.FILES.get('logo')
-            
+
         customer.save()
         
         messages.success(request, f'Customer details edited successfully.')
@@ -568,7 +568,7 @@ def remove_customer(request, pk):
     if request.method == 'POST':
         customer = Customer.objects.get(id=pk, company=get_user_company(request))
         customer.delete()
-        messages.success(request, f'Customer {customer.first_name} removed')
+        messages.success(request, f'Customer {customer.name} removed')
         return redirect('list_customers')
 #--ends
 
@@ -621,7 +621,11 @@ def update_consignee(request, pk):
         consignee.country = request.POST.get('country')
         consignee.city = request.POST.get('city')
         consignee.website = request.POST.get('website')
-        consignee.logo = request.FILES.get('logo')
+
+        # Check if new images/files are provided
+        if request.FILES.get('logo'):
+            consignee.logo = request.FILES.get('logo')
+
         consignee.save()
         
         messages.success(request, f'Consignee details updated successfully.')
@@ -638,7 +642,6 @@ def update_consignee(request, pk):
             'country': consignee.country,
             'city': consignee.city,
             'website': consignee.website,
-            'logo': consignee.logo,
         }
 
         form = ConsigneeForm(initial=form_data )
@@ -731,7 +734,11 @@ def update_shipper(request, pk):
         shipper.country = request.POST.get('country')
         shipper.city = request.POST.get('city')
         shipper.website = request.POST.get('website')
-        shipper.logo = request.FILES.get('logo')
+
+        # Check if new images/files are provided
+        if request.FILES.get('logo'):
+            shipper.logo = request.FILES.get('logo')
+
         shipper.save()
         
         messages.success(request, f'Shipper details updated successfully.')
@@ -748,7 +755,6 @@ def update_shipper(request, pk):
             'country': shipper.country,
             'city': shipper.city,
             'website': shipper.website,
-            'logo': shipper.logo,
         }
 
         form = ShipperForm(initial=form_data )

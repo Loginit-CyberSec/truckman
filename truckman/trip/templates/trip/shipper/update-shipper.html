@@ -27,7 +27,7 @@
                 <div class="nk-block">
                     <div class="card card-bordered">
                         <div class="card-inner">
-                            <form action="{% url 'update_shipper' shipper.id %}" method="POST" enctype="multipart/form-data" >
+                            <form action="{% url 'update_shipper' shipper.id %}" method="POST" class="form-validate" enctype="multipart/form-data" >
                                 {% csrf_token %}
                                 <div class="row gy-4">
                                     <div class="col-xxl-3 col-md-4">
@@ -108,6 +108,9 @@
                                                     {{ form.logo }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
+                                                {% if shipper.logo %}
+                                                <p>Current Logo: <a href="{{ shipper.logo.url }}" target="_blank">{{ shipper.logo.name }}</a></p>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
