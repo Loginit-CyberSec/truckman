@@ -162,8 +162,7 @@ def add_vehicle(request):
 def update_vehicle(request, pk):
     company = get_user_company(request) #get request user company
     vehicle = Vehicle.objects.get(id=pk, company=company)
-    #instantiate the two kwargs to be able to access them on the forms.py
-    #form = VehicleForm(request.POST, company=company) 
+
     if request.method == 'POST':
         #get post data
         make_id = request.POST.get('make')
@@ -186,11 +185,24 @@ def update_vehicle(request, pk):
         vehicle.purchase_year = request.POST.get('purchase_year')
         vehicle.condition = request.POST.get('condition')
         vehicle.notes = request.POST.get('notes')
-        vehicle.truck_image = request.FILES.get('truck_image')
-        vehicle.trailer_image = request.FILES.get('trailer_image')
-        vehicle.truck_logbook = request.FILES.get('truck_logbook')
-        vehicle.trailer_logbook = request.FILES.get('trailer_logbook')
         vehicle.good_transit_licence = request.FILES.get('good_transit_licence')
+
+        # Check if new images/files are provided
+        if request.FILES.get('truck_image'):
+            vehicle.truck_image = request.FILES.get('drivetruck_imager_photo')
+
+        if request.FILES.get('trailer_image'):
+            vehicle.trailer_image = request.FILES.get('trailer_image')
+
+        if request.FILES.get('truck_logbook'):
+            vehicle.truck_logbook = request.FILES.get('truck_logbook')
+
+        if request.FILES.get('trailer_logbook'):
+            vehicle.trailer_logbook = request.FILES.get('trailer_logbook')
+
+        if request.FILES.get('good_transit_licence'):
+            vehicle.good_transit_licence = request.FILES.get('good_transit_licence')
+
         vehicle.save()
         
         messages.success(request, f'Vehicle {vehicle.plate_number} was edited successfully.')
@@ -211,11 +223,6 @@ def update_vehicle(request, pk):
             'purchase_year': vehicle.purchase_year,
             'condition': vehicle.condition,
             'notes': vehicle.notes,
-            'truck_image': vehicle.truck_image,
-            'trailer_image': vehicle.trailer_image,
-            'truck_logbook': vehicle.truck_logbook,
-            'trailer_logbook': vehicle.trailer_logbook,
-            'good_transit_licence': vehicle.good_transit_licence,
         }
 
         form = VehicleForm(initial=form_data, company=company )

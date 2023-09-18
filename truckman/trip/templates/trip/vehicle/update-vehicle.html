@@ -159,52 +159,60 @@
                                             <p>Update truck head and trailer images and other required documents. </p>
                                         </div>
                                     </div>
-                                    <div class="col-xxl-3 col-md-4"> 
+                                    <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label" for="customFileLabel">Truck Head Image</label>
                                             <div class="form-control-wrap">
                                                 <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
                                                     {{ form.truck_image }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
+                                            {% if vehicle.truck_image %}
+                                            <p>Current Truck Image: <a href="{{ vehicle.truck_image.url }}" target="_blank">{{ vehicle.truck_image.name }}</a></p>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    <div class="col-xxl-3 col-md-4"> 
+                                    <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label" for="customFileLabel">Trailer Image</label>
                                             <div class="form-control-wrap">
                                                 <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
                                                     {{ form.trailer_image }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
+                                            {% if vehicle.truck_image %}
+                                            <p>Current Truck Image: <a href="{{ vehicle.trailer_image.url }}" target="_blank">{{ vehicle.trailer_image.name }}</a></p>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    <div class="col-xxl-3 col-md-4"> 
+                                    <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label" for="customFileLabel">Truck Logbook</label>
                                             <div class="form-control-wrap">
                                                 <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
                                                     {{ form.truck_logbook }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
+                                            {% if vehicle.truck_logbook %}
+                                            <p>Current Truck Logbook: <a href="{{ vehicle.truck_logbook.url }}" target="_blank">{{ vehicle.truck_logbook.name }}</a></p>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    <div class="col-xxl-3 col-md-4"> 
+                                    <div class="col-xxl-3 col-md-4">
                                         <div class="form-group">
                                             <label class="form-label" for="customFileLabel">Trailer Logbook</label>
                                             <div class="form-control-wrap">
                                                 <div class="form-file">
-                                                    <!--<input type="file" class="form-file-input" id="customFile">-->
                                                     {{ form.trailer_logbook }}
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
+                                            {% if vehicle.trailer_logbook %}
+                                            <p>Current Trailer Logbook: <a href="{{ vehicle.trailer_logbook.url }}" target="_blank">{{ vehicle.trailer_logbook.name }}</a></p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="col-xxl-3 col-md-4"> 
@@ -217,6 +225,9 @@
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
+                                            {% if vehicle.good_transit_licence %}
+                                            <p>Current Good Transit Licence: <a href="{{ vehicle.good_transit_licence.url }}" target="_blank">{{ vehicle.good_transit_licence.name }}</a></p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="col-12">
