@@ -1108,8 +1108,8 @@ def view_trip(request, pk):
     category_form = ExpenseCategoryForm(request.POST) # for expense category modal
     payment_form = PaymentForm(request.POST, company=company) # for payment modal
     vehicle = trip.vehicle
-    if vehicle.is_assigned_driver:
-        driver = Driver.objects.get(assigned_vehicle=vehicle)        
+    #if vehicle.is_assigned_driver:
+    driver = Driver.objects.get(assigned_vehicle=vehicle)        
     context={
         'company':company,
         'trip':trip,
@@ -1178,11 +1178,9 @@ def send_to_shipper(request, pk):
             os.remove(temp_pdf_path)
 
     # Save the merged PDF to a file or send it by email
-    merged_pdf_path = f"merged_trip_documents.pdf"
+    merged_pdf_path = f"trip_docs/merged_trip_documents.pdf"
     merger.write(open(merged_pdf_path, 'wb'))
     merger.close()
-
-
 
     #send email
     context = {

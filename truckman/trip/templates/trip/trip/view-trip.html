@@ -274,7 +274,7 @@
                                                                                             </a>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-sm">
-                                                                                            {% if trip.vehicle.truck_logbook%}   
+                                                                                            {% if trip.vehicle.truck_logbook %}   
                                                                                             <span class="fw-medium text-success">Uploaded</span>
                                                                                             {% else %}
                                                                                             <span class="fw-medium text-warning">Not Uploaded</span>
@@ -284,16 +284,20 @@
                                                                                             <span>Truck</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if trip.vehicle.truck_logbook %}
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Truck logbook<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Truck logbook<a href="{{ trip.vehicle.truck_logbook.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %}
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    {% if trip.vehicle.truck_logbook %}
+                                                                                                    <a href="{{ trip.vehicle.truck_logbook.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                                 
                                                                                             </ul>
@@ -316,7 +320,7 @@
                                                                                             </a>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-sm">
-                                                                                            {% if trip.vehicle.trailer_logbook%}   
+                                                                                            {% if trip.vehicle.trailer_logbook %}   
                                                                                             <span class="fw-medium text-success">Uploaded</span>
                                                                                             {% else %}
                                                                                             <span class="fw-medium text-warning">Not Uploaded</span>
@@ -326,14 +330,16 @@
                                                                                             <span>Trailer</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if trip.vehicle.trailer_logbook %} 
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Trailer logbook<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Trailer logbook<a href="{{ trip.vehicle.trailer_logbook.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %} 
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    <a href="{{ trip.vehicle.trailer_logbook.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
                                                                                                 </li>
@@ -369,15 +375,19 @@
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Truck image<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                {% if trip.vehicle.truck_image %}
+                                                                                                <li>Truck image<a href="{{ trip.vehicle.truck_image.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                {% endif %}
                                                                                             </ul>
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    {% if trip.vehicle.truck_image %}
+                                                                                                    <a href="{{ trip.vehicle.truck_image.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                                 
                                                                                             </ul>
@@ -411,15 +421,19 @@
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Trailer Image<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                {% if trip.vehicle.trailer_image %} 
+                                                                                                <li>Trailer Image<a href="{{ trip.vehicle.trailer_image.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                {% endif %}
                                                                                             </ul>
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    {% if trip.vehicle.trailer_image %}
+                                                                                                    <a href="{{ trip.vehicle.trailer_image.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                                 
                                                                                             </ul>
@@ -453,15 +467,19 @@
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Good Transit Licence<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                {% if trip.vehicle.good_transit_licence %} 
+                                                                                                <li>Good Transit Licence<a href="{{ trip.vehicle.good_transit_licence.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                {% endif %}
                                                                                             </ul>
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    {% if trip.vehicle.good_transit_licence %} 
+                                                                                                    <a href="{{ trip.vehicle.good_transit_licence.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                                 
                                                                                             </ul>
@@ -495,16 +513,20 @@
                                                                                             <span>Driver</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if driver.driver_photo %} 
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Driver Photo<a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Driver Photo<a href="{{ driver.driver_photo.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %} 
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    {% if driver.driver_photo %} 
+                                                                                                    <a href="{{ driver.driver_photo.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                                 
                                                                                             </ul>
@@ -538,18 +560,21 @@
                                                                                             <span>Driver</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if driver.id_img %} 
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Driver ID <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Driver ID <a href="{{ driver.id_img.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %}
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
+                                                                                                {% if driver.id_img %} 
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    <a href="{{ driver.id_img.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
                                                                                                 </li>
-                                                                                                
+                                                                                                {% endif %}
                                                                                             </ul>
                                                                                         </div>
                                                                                     </div><!-- .nk-tb-item -->
@@ -581,18 +606,21 @@
                                                                                             <span>Driver</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if driver.dl_front_img %}
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Driver DL Front <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Driver DL Front <a href="{{ driver.dl_front_img.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %}
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
+                                                                                                {% if driver.dl_front_img %}
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    <a href="{{ driver.dl_front_img.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
                                                                                                 </li>
-                                                                                                
+                                                                                                {% endif %}
                                                                                             </ul>
                                                                                         </div>
                                                                                     </div><!-- .nk-tb-item -->
@@ -624,18 +652,21 @@
                                                                                             <span>Driver</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if driver.dl_back_img %} 
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Driver DL Back <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Driver DL Back <a href="{{ driver.dl_back_img.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %}
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
+                                                                                                {% if driver.dl_back_img %} 
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    <a href="{{ driver.dl_back_img.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
                                                                                                 </li>
-                                                                                                
+                                                                                                {% endif %}
                                                                                             </ul>
                                                                                         </div>
                                                                                     </div><!-- .nk-tb-item -->
@@ -667,16 +698,20 @@
                                                                                             <span>Driver</span>
                                                                                         </div>
                                                                                         <div class="nk-tb-col tb-col-mb">
+                                                                                            {% if driver.passport_image %}
                                                                                             <ul class="list-inline list-download">
-                                                                                                <li>Driver Passport <a href="#" class="popup"><em class="icon ni ni-download"></em></a></li>
+                                                                                                <li>Driver Passport <a href="{{ driver.passport_image.url }}" target="_blank" class="popup"><em class="icon ni ni-download"></em></a></li>
                                                                                             </ul>
+                                                                                            {% endif %}
                                                                                         </div>
                                                                                         <div class="nk-tb-col nk-tb-col-tools">
                                                                                             <ul class="nk-tb-actions gx-1">
                                                                                                 <li class="nk-tb-action-hidden">
-                                                                                                    <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                                                                                    {% if driver.passport_image %}
+                                                                                                    <a href="{{ driver.passport_image.url }}" target="_blank" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
                                                                                                         <em class="icon ni ni-eye"></em>
                                                                                                     </a>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                                 
                                                                                             </ul>
@@ -968,7 +1003,7 @@
                                                 </div><!-- .card -->
                                             </div><!-- .nk-block -->
                                         </div><!--tab pane-->
-                                    </div><!--tab content-->
+                                    </div><!--tab content--> 
                                 </div><!--card inner-->
                             </div><!-- .card-content -->
                             <div class="card-aside card-aside-right user-aside toggle-slide toggle-slide-right toggle-break-xxl" data-content="userAside" data-toggle-screen="xxl" data-toggle-overlay="true" data-toggle-body="true">
