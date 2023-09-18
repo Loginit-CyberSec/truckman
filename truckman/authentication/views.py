@@ -439,7 +439,18 @@ def view_staff(request, pk):
 @login_required(login_url='login')
 @permission_required('authentication.delete_customuser')
 def remove_staff(request, pk):
-    pass
+    company = get_user_company(request) 
+    staff = CustomUser.objects.get(id=pk, company=company)    
+    if request.method == 'POST':
+        if '-admin' in staff.role.name:
+            messages.error(request, "Cannot delete the default admin.")
+            return redirect('list_staffs')
+        else:
+            staff.delete()
+            messages.success(request, 'Staff deleted successfully!')
+            return redirect('list_staffs') 
+
+    return redirect('list_staffs')
 
 #----------------- User Views ---------------------------
 # user profile
