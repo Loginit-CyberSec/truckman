@@ -506,7 +506,11 @@ def update_customer(request, pk):
         customer.website = request.POST.get('website')
         customer.credit_limit = request.POST.get('credit_limit')
         customer.payment_term = request.POST.get('payment_term')
-        customer.logo = request.FILES.get('logo')
+
+        # Check if new images/files are provided
+        if request.FILES.get('logo'):
+            customer.logo = request.FILES.get('logo')
+            
         customer.save()
         
         messages.success(request, f'Customer details edited successfully.')
@@ -525,7 +529,6 @@ def update_customer(request, pk):
             'website': customer.website,
             'credit_limit': customer.credit_limit,
             'payment_term': customer.payment_term,
-            'logo': customer.logo,
         }
 
         form = CustomerForm(initial=form_data)

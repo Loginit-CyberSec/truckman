@@ -128,12 +128,7 @@ class DriverForm(forms.ModelForm):
         
 #---------------------------------- Customer forms ------------------------------------------   
 class CustomerForm(forms.ModelForm):
-    '''
-    def __init__(self, *args, **kwargs):
-        company = kwargs.pop('company')# Get the company from kwargs
-        super(CustomerForm, self).__init__(*args, **kwargs)
-        self.fields['assigned_vehicle'].queryset = Customer.objects.filter(company=company) 
-    '''
+
     class Meta:
         model = Customer
         fields = '__all__'

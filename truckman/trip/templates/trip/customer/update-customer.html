@@ -26,7 +26,7 @@
                 <div class="nk-block">
                     <div class="card card-bordered">
                         <div class="card-inner">
-                            <form action="{% url 'update_customer' customer.id %}" method="POST" enctype="multipart/form-data" >
+                            <form action="{% url 'update_customer' customer.id %}" method="POST" class="form-validate" enctype="multipart/form-data" >
                                 {% csrf_token %}
                                 <div class="row gy-4">
                                     <div class="col-xxl-3 col-md-4">
@@ -124,6 +124,9 @@
                                                     <label class="form-file-label" for="customFile">Choose file</label>
                                                 </div>
                                             </div>
+                                            {% if customer.logo %}
+                                            <p>Current Logo: <a href="{{ customer.logo.url }}" target="_blank">{{ customer.logo.name }}</a></p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="col-12">
