@@ -296,7 +296,7 @@ class EstimateForm(forms.ModelForm):
         exclude =['company', 'estimate_id', 'date_added']
 
         widgets = {
-                'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customer'}),
+                'customer': forms.Select(attrs={'class': 'form-select js-select2', 'id':'customerSelect'}),
                 'item': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Steel Coils'}),
                 'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Some descriptions.'}),
                 #'sub_total': forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'7800'}),

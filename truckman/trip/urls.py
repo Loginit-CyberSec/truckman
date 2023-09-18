@@ -36,6 +36,8 @@ urlpatterns = [
     path('remove_customer/<str:pk>', views.remove_customer, name='remove_customer'),
     path('view_customer/<str:pk>', views.view_customer, name='view_customer'),
     path('list_customers', views.list_customers, name='list_customers'),
+
+    path('add_customer_modal', views.add_customer_modal, name='add_customer_modal'),
     #--ends
 
     #shipper urls
@@ -119,6 +121,9 @@ urlpatterns = [
     path('list_estimates', views.list_estimates, name='list_estimates'),
 
     path('send_estimate/<str:pk>', views.send_estimate, name='send_estimate'),
+    path('estimate_negotiate/<str:estimate_id>', views.view_estimate_negotiate_mode, name='view_estimate_negotiate_mode'),
+    path('accept_estimate/<str:pk>', views.accept_estimate, name='accept_estimate'),
+    path('decline_estimate/<str:pk>', views.decline_estimate, name='decline_estimate'),
     #--ends
 
     #reminder urls

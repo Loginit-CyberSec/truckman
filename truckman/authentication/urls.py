@@ -6,7 +6,9 @@ urlpatterns = [
     #organization urls
     path('register', views.register_user, name='register'),
     path('login', views.login_user, name='login'), 
-    path('logout', views.logout_user, name='logout'), 
+    path('logout', views.logout_user, name='logout'),  
+    path('verify-email/<str:uid>/<str:token>', views.verify_email, name='verify-email'),
+    path('resend_email_token/<str:uid>', views.resend_email_token, name='resend_email_token'), 
 
     # organization preferences urls
     path('settings', views.global_settings, name='global_settings'), 

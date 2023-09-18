@@ -2,6 +2,7 @@
 
 {% block content %}
 <!-- content @s -->
+{% if messages %}
 {% for message in messages %}
     <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
         {{ message }}

@@ -7,7 +7,7 @@
     <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-primary{% endif %}">
         {{ message }}
     </div>
-{% endfor %}
+{% endfor %} 
 {% endif %}
 <div class="nk-content ">
     <div class="container-fluid">
@@ -26,6 +26,7 @@
                                     <li class="nav-item">
                                         <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1"><em class="icon ni ni-user-circle-fill"></em><span>Overview</span></a>
                                     </li>
+                                    <!-- 
                                     <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#tabItem2"><em class="icon ni ni-property"></em><span>Settlement Details</span></a>
                                     </li>
@@ -37,7 +38,7 @@
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#tabItem5"><em class="icon ni ni-wallet-in"></em><span>Payments</span> </a>
-                                    </li>
+                                    </li> -->
                                 </ul>
                                 <div class="card-inner">
                                     <div class="tab-content">
@@ -57,52 +58,47 @@
                                                 <div class="profile-ud-list">
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Name</span>
-                                                            <span class="profile-ud-value">{{ driver.first_name}} {{ driver.last_name}}</span>
+                                                            <span class="profile-ud-label">Shipper</span>
+                                                            <span class="profile-ud-value">{{ load.shipper.name}}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">ID No.</span>
-                                                            <span class="profile-ud-value">{{ driver.id_no}}</span>
+                                                            <span class="profile-ud-label">Consignee</span>
+                                                            <span class="profile-ud-value">{{ load.consignee.name }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Age</span>
-                                                            <span class="profile-ud-value">41 years 0 months 3 days</span>
+                                                            <span class="profile-ud-label">Commodity</span>
+                                                            <span class="profile-ud-value">{{ load.commodity }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Home Mobile</span>
-                                                            <span class="profile-ud-value">{{ driver.tel_home}}</span>
+                                                            <span class="profile-ud-label">Weight</span>
+                                                            <span class="profile-ud-value">{{ load.weight }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Roaming Mobile</span>
-                                                            <span class="profile-ud-value">{{ driver.tel_roam}}</span>
+                                                            <span class="profile-ud-label">Pick Up Date</span>
+                                                            <span class="profile-ud-value">{{ load.pickup_date }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Passport No</span>
-                                                            <span class="profile-ud-value">{{ driver.passport_number}}</span>
+                                                            <span class="profile-ud-label">Delivery Date</span>
+                                                            <span class="profile-ud-value">{{ load.delivery_date }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Date Hired</span>
-                                                            <span class="profile-ud-value">{{ driver.date_hired }}</span>
+                                                            <span class="profile-ud-label">Driver Instructions</span>
+                                                            <span class="profile-ud-value">{{ load.driver_instructions }}</span>
                                                         </div>
                                                     </div>
-                                                    <div class="profile-ud-item">
-                                                        <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Date Terminated</span>
-                                                            <span class="profile-ud-value">{{ driver.date_terminated }}</span>
-                                                        </div>
-                                                    </div>
+                                                    
                                                 </div><!-- .profile-ud-list -->
                                             </div><!-- .nk-block -->
                                             <div class="nk-block">
@@ -112,28 +108,11 @@
                                                 <div class="profile-ud-list">
                                                     <div class="profile-ud-item">
                                                         <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Emergency Contact Person</span>
-                                                            <span class="profile-ud-value">{{ driver.emergency_contact_person }}</span>
+                                                            <span class="profile-ud-label">Associated Quotation</span>
+                                                            <span class="profile-ud-value"><a href="{% url 'view_estimate' load.estimate.id %}">{{ load.estimate.estimate_id }}</a></span>
                                                         </div>
                                                     </div>
-                                                    <div class="profile-ud-item">
-                                                        <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Emergency Contact Number I</span>
-                                                            <span class="profile-ud-value">{{driver.emergency_contact_person }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="profile-ud-item">
-                                                        <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Emergency Contact Number I</span>
-                                                            <span class="profile-ud-value">{{driver.emergency_contact_two }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="profile-ud-item">
-                                                        <div class="profile-ud wider">
-                                                            <span class="profile-ud-label">Assigned Vehicle</span>
-                                                            <span class="profile-ud-value">{{driver.assigned_vehicle.plate_number }}</span>
-                                                        </div>
-                                                    </div>
+                                                    
                                                 </div><!-- .profile-ud-list -->
                                             </div><!-- .nk-block -->
                                             

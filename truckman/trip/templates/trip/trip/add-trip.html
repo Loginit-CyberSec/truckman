@@ -182,7 +182,10 @@
 </div>
 <!-- content @e -->
 
+
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <!-- get vehicle and driver details on choosing a trip -->
 <script>
@@ -197,7 +200,6 @@
         vehicleSelect.on("change", function () {
             // Get the selected vehicle ID
             var vehicleId = $(this).val();
-            console.log('This is the vehicle id', vehicleId)
 
             // Send a GET request to fetch vehicle and customer information
             $.get("/trip/get_vehicle_info/" + vehicleId, function (data) {

@@ -20,6 +20,8 @@ from reportlab.pdfgen import canvas
 from PyPDF2 import PdfMerger, PdfReader
 from PIL import Image
 import io
+from django.conf import settings
+from django.urls import reverse
 
 
 from . models import (
@@ -98,15 +100,10 @@ def add_vehicle_model(request):
             make=make
         )
 
-        #messages.success(request, f' {vehicle_model.name} was added successfully.')
-        #return redirect('add_vehicle')
         return JsonResponse({'success': True, 'model': {'id': vehicle_model.id, 'name': vehicle_model.name}})
     else:
             return JsonResponse({'success': False})
 
-    #redirect
-    #context= {'form':form}
-    #return render(request, 'trip/vehicle-model/add-vehicle-model.html', context)
 #--ends
 
 #---------------------------------- Vehicle Views------------------------------------------
@@ -440,6 +437,34 @@ def add_customer(request):
 
     context= {'form':form}
     return render(request, 'trip/customer/add-customer.html', context)
+#--ends
+
+# add customer view for modals
+@login_required(login_url='login')
+def add_customer_modal(request):
+    company = get_user_company(request) 
+    #instantiate the two kwargs to be able to access them on the forms.py
+    form = CustomerForm(request.POST) 
+    if request.method == 'POST':
+        #create instance of a customer
+        customer = Customer.objects.create(
+            company=company,
+            name = request.POST.get('name'),
+            contact_person = request.POST.get('contact_person'),
+            phone = request.POST.get('phone'),
+            email = request.POST.get('email'),
+            address_one = request.POST.get('address_one'),
+            address_two = request.POST.get('address_two'),
+            country = request.POST.get('country'),
+            city = request.POST.get('city'),
+            website = request.POST.get('website'),
+            credit_limit = request.POST.get('credit_limit'),
+            payment_term = request.POST.get('payment_term'),
+            logo = request.FILES.get('logo'),
+        )
+        return JsonResponse({'success': True, 'customer': {'id': customer.id, 'name': customer.name}})
+    else:
+        return JsonResponse({'success': False})
 #--ends
 
 # update customer
@@ -914,7 +939,7 @@ def remove_load(request, pk):
 def add_trip(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
-    form = TripForm(request.POST, company=company) 
+    form = TripForm(request.POST, company=company)
     if request.method == 'POST':
 
         load_id = request.POST.get('load')
@@ -1157,14 +1182,12 @@ def docs_bulky_action(request, pk):
     if request.method == 'POST':
         # Retrieve the selected option from the form data
         bulk_action = request.POST.get('bulk-action')
-        print(f'Selected action {bulk_action}')
         selected_ids = request.POST.getlist('selected_ids')
         selected_docs = []
         trip = Trip.objects.get(id=pk)
 
         if bulk_action == 'share':
             #send as email to provided email
-            print('i got here. insdie share code command')
             pdf_documents = []
             context = {
                 'company':company.name,
@@ -1181,19 +1204,16 @@ def docs_bulky_action(request, pk):
                 recipient_email=email, 
                 replyto_email=company.email
             )
-            print('step three')
             messages.success(request, 'Messages sent.')
             return redirect('view_trip', trip.id)
 
         elif bulk_action == 'send':
             #send selected docs to shipper
-            print('step four')
             messages.success(request, 'Sent to shipper.')
             return redirect('view_trip', trip.id)
         
         elif bulk_action == 'download':
             #download selected docs
-            print('step five')
             messages.success(request, 'Documents downloading...')
             return redirect('view_trip', trip.id)
 
@@ -1792,6 +1812,7 @@ def add_estimate(request):
     company = get_user_company(request) 
     #instantiate the two kwargs to be able to access them on the forms.py
     form = EstimateForm(request.POST, company=company)  
+    customer_form = CustomerForm(request.POST) 
     if request.method == 'POST':
 
         customer_id = request.POST.get('customer')
@@ -1818,6 +1839,7 @@ def add_estimate(request):
 
     context= {
         'form':form,
+        'customer_form':customer_form
     }
     return render(request, 'trip/estimate/add-estimate.html', context)
 #--ends
@@ -1925,37 +1947,88 @@ def send_estimate(request, pk):
     estimate = Estimate.objects.get(id=pk, company=company)
     preference = Preference.objects.get(company=company)
 
+    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[estimate.estimate_id]))
     #having this context because delay() need model serialzation
     context = {
         'customer_name': estimate.customer.name,
-        'estimate_pdf': 'pdf of the estimate',
+        'estimate_url': estimate_url,
         'company_name': company.name
-        #'due_amount': loan.due_amount,
-        #'due_date': user_local_time(loan.company.timezone, loan.due_date).date(),
-        #'total_payable': loan.total_payable(),
-        #'tzone':company.timezone
     }
 
-    from_name = preference.email_from_name
-    from_email = preference.from_email
-    template_path = 'trip/estimate/load-estimate.html'
-    subject = 'Quotation'
-    recipient_email = estimate.customer.email
-    replyto_email = company.email
-
     send_email_task.delay(
-        context, 
-        template_path, 
-        from_name, 
-        from_email, 
-        subject, 
-        recipient_email, 
-        replyto_email
+        context=context, 
+        template_path='trip/estimate/load-estimate.html', 
+        from_name='Loginit Truckman', #revert back to this preference.email_from_name
+        from_email=settings.EMAIL_HOST_USER, #revert back to this preference.from_email
+        subject='Quotation', 
+        recipient_email=estimate.customer.email, 
+        replyto_email=company.email
     )
 
     messages.success(request, 'Estimate sent to customer.')
     return redirect('view_estimate', estimate.id)
 
+#accept estimate
+def accept_estimate(request, pk):
+    estimate = Estimate.objects.get(id=pk)
+    estimate.status = 'Accepted'
+    estimate.save()
+    #send email to admin notify them about the acceptance
+    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
+    context = {
+        'estimate':estimate.estimate_id,
+        'estimate_url' : estimate_url
+    }
+    send_email_task(
+        context=context, 
+        template_path='trip/estimate/estimate-accepted.html', 
+        from_name='Loginit Truckman', 
+        from_email=settings.EMAIL_HOST_USER, 
+        subject='Estimate Accepted', 
+        recipient_email=estimate.company.email, 
+        replyto_email=settings.EMAIL_HOST_USER
+    )
+    return redirect('view_estimate_negotiate_mode', estimate.id )
+
+#decline estimate
+def decline_estimate(request, pk):
+    estimate = Estimate.objects.get(id=pk)
+    estimate.status = 'Declined'
+    estimate.save()
+
+    #send email to admin notify them about the rejection
+    estimate_url = request.build_absolute_uri(reverse('view_estimate', args=[pk]))
+    context = {
+        'estimate':estimate.estimate_id,
+        'estimate_url' : estimate_url
+    }
+    send_email_task(
+        context=context, 
+        template_path='trip/estimate/estimate-declined.html', 
+        from_name='Loginit Truckman', 
+        from_email=settings.EMAIL_HOST_USER, 
+        subject='Estimate Declined', 
+        recipient_email=estimate.company.email, 
+        replyto_email=settings.EMAIL_HOST_USER
+    )
+    return redirect('view_estimate_negotiate_mode', estimate.id )
+
+#share estimate uri with customer
+def view_estimate_negotiate_mode(request, estimate_id):
+    estimate = Estimate.objects.get(estimate_id=estimate_id)
+    company = estimate.company
+    context={
+        'estimate':estimate,
+        'company':company
+        }
+    return render(request, 'trip/estimate/view-estimate-nego-mode.html', context)
+#--ends
+
+def negotiate_estimate(request):
+    if request.method == 'POST':
+        pass
+        #get response from post
+    
 #---------------------------------- Reminder views------------------------------------------
 
 # add reminder

@@ -1,5 +1,6 @@
 from django.db import models
 from django.db import transaction
+import uuid
 from authentication.forms import Client, CustomUser
 
 #---------------------------------- Vehicle models ------------------------------------------

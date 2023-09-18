@@ -24,6 +24,17 @@
                                 </ul>
                             </div>
                         </div>
+                        <div class="dropdown">
+                            <a href="#" class="btn btn-primary" data-bs-toggle="dropdown"><span>Actions</span><em class="icon ni ni-chevron-down"></em></a>
+                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-auto mt-1">
+                                <ul class="link-list-plain">
+                                    <li><a href="#">Download</a></li>
+                                    <li><a href="{% url 'update_estimate' estimate.id %}">Update</a></li>
+                                    <li><a href="{% url 'send_estimate' estimate.id %}">Send to Customer</a></li>
+                                    <li><a href="{% url 'add_trip' %}">Start Trip</a></li>
+                                </ul>
+                            </div>
+                        </div>
                         <div class="nk-block-head-content">
                             <a href="{% url 'list_estimates' %}" class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em class="icon ni ni-arrow-left"></em><span>Back</span></a>
                             <a href="{% url 'list_estimates' %}" class="btn btn-icon btn-outline-light bg-white d-inline-flex d-sm-none"><em class="icon ni ni-arrow-left"></em></a>

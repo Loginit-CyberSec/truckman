@@ -1,6 +1,22 @@
-{% extends 'base.html' %}  
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+{% load static %}
+<head>
+    <base href="../../../">
+    <meta charset="utf-8">
+    <meta name="author" content="Loginit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="TMS">
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{% static 'assets/favicon.ico' %}">
+    <!-- Page Title  -->
+    <title>Access Denied | Loginit Truckman</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="./assets/css/dashlite.css?ver=3.2.0">
+    <link id="skin-default" rel="stylesheet" href="./assets/css/theme.css?ver=3.2.0">
+    <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
 
 <body class="nk-body bg-white npc-general pg-error">
     <div class="nk-app-root">
@@ -27,4 +43,3 @@
         </div>
         <!-- main @e -->
     </div>
-    {% endblock content %}  

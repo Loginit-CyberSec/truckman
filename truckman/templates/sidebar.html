@@ -3,10 +3,12 @@
 <div class="nk-sidebar" data-content="sidebarMenu">
     <div class="nk-sidebar-bar">
         <div class="nk-apps-brand">
+            {% if company.logo %}
             <a href="{% url 'home' %}" class="logo-link">
                 <img class="logo-light logo-img" src="{{ company.logo.url }}" srcset="{{ company.logo.url }}" alt="logo">
                 <img class="logo-dark logo-img" src="{{ company.logo.url }}" srcset="{{ company.logo.url }}" alt="logo-dark">
             </a>
+            {% endif %}
         </div>
         <div class="nk-sidebar-element">
             <div class="nk-sidebar-body">

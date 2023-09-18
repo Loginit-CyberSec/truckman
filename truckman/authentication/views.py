@@ -23,31 +23,142 @@ def register_user(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
 
+
             # Create a new client/tenant
             client = Client.objects.create(
                 name=company_name,
                 email=email,
             )
 
-            # Create a new user associated with the client
+            # Get all available permissions
+            permissions = Permission.objects.filter(
+                    content_type__model__in=[
+                        'client', 'customuser', 'role', 'vehicle_make',
+                        'vehicle_model', 'vehicle', 'driver', 'customer',
+                        'consignee', 'shipper', 'load', 'trip', 'estimate',
+                        'invoice', 'payment', 'expense', 'expense_category', 'reminder' 
+                    ] 
+                )
+
+            # Create a superadmin Role i
+            role = Role(
+                company=client,
+                name=client.name +'-admin',
+                description='Company admin role.'
+            )
+            role.save()
+
+            #assign the admin role all permissions
+            role.permissions.set(permissions) 
+
+            # Create a new user associated with the client 
             user = CustomUser.objects.create_user(
                 username=email,
                 email=email,
                 password=password,
-                company=client
+                company=client,
+                role=role
+            )
+            #assign the created user all the permissions
+            user.user_permissions.add(*permissions)
+
+            # activate email token generator
+            token_generator = PasswordResetTokenGenerator()
+            verify_email_url = request.build_absolute_uri(reverse('verify-email', args=[user.id, token_generator.make_token(user)])) 
+            context = {
+                'company_name':company_name,
+                'user':user.username,
+                'verify_email_url':verify_email_url
+                }
+
+            #send welcome email 
+            send_email_task.delay(
+                context=context,
+                template_path='authentication/user/company_welcome.html',
+                from_name='Loginit',
+                from_email=settings.EMAIL_HOST_USER,
+                subject='Welcome to Truckman',
+                recipient_email=email,
+                replyto_email=settings.EMAIL_HOST_USER
             )
 
-            # Log in the user
-            login(request, user)
-            
-            messages.success(request, 'Account created successfully.')
-            # Redirect to a success page or the user's dashboard
-            return redirect('home') 
+            #send email for email verification 
+            send_email_task.delay(
+                context=context,
+                template_path='authentication/user/verify-emailtemplate.html',
+                from_name='Loginit',
+                from_email=settings.EMAIL_HOST_USER,
+                subject='Verify Your Email',
+                recipient_email=email,
+                replyto_email=settings.EMAIL_HOST_USER
+            )
+            messages.success(request, 'User created successfully! Please check your email for acount verification.')
+            return render(request, 'authentication/user/verify-email.html')
     else:
         form = CustomUserCreationForm()
 
     context = {'form': form}
     return render(request, 'authentication/auth-register.html', context)
+
+#--verify email view
+def verify_email(request, uid, token):
+    # Retrieve the user using the uid
+    try:
+        user = CustomUser.objects.get(id=uid)
+    except CustomUser.DoesNotExist:
+        user = None
+
+    if user is not None:
+        # Verify the token
+        token_generator = PasswordResetTokenGenerator()
+        if token_generator.check_token(user, token):
+            # Token is valid
+            user.is_verified = True
+            user.save()
+            messages.success(request, 'Account successfully verified. Please login.')
+            # Redirect to the company settings page
+            return redirect('global_settings')
+
+        else:
+            # Invalid token
+            messages.error(request, 'Invalid token! Please try again.')
+            return render(request, 'authentication/user/invalid-token.html')
+        
+    # Invalid user or other error
+    context = {
+        'user':user,
+    }
+    messages.error(request, 'Invalid user or other error! Please try again.')
+    return render(request, 'authentication/user/invalid-token.html', context=context)
+#-- ends
+
+#-- resend email verification token incase it expires
+def resend_email_token(request, uid):
+    #retrieve the user requesting for resend
+    try:
+        user = CustomUser.objects.get(id=uid)
+    except:
+        user = None
+    #activate email token generator
+    token_generator = PasswordResetTokenGenerator()
+    verify_email_url = request.build_absolute_uri(reverse('verify-email', args=[user.id, token_generator.make_token(user)])) 
+    context = {
+        'user':user.username,
+        'verify_email_url':verify_email_url
+        }
+    #send email for email verification 
+    send_email_task.delay(
+        context=context,
+        template_path='authentication/user/verify-emailtemplate.html',
+        from_name='Loginit',
+        from_email=settings.EMAIL_HOST_USER,
+        subject='Verify Your Email',
+        recipient_email=user.email,
+        replyto_email=settings.EMAIL_HOST_USER
+    )
+    messages.success(request, 'Please check your email for account verification.')
+    return render(request, 'authentication/user/verify-email.html') 
+#-- ends 
     
 #login a user
 def login_user(request):
