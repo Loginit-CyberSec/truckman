@@ -406,8 +406,14 @@ def view_driver(request, pk):
 def remove_driver(request, pk):
     if request.method == 'POST':
         driver = Driver.objects.get(id=pk, company=get_user_company(request))
+        vehicle = driver.assigned_vehicle
+
+        #free the associated vehicle
+        if vehicle:
+            vehicle.is_assigned_driver = False
         driver.delete()
-        messages.success(request, f'Driver {driver.first_name} removed')
+        
+        messages.success(request, f'Driver {driver.first_name} {driver.last_name} removed')
         return redirect('list_drivers')
 #--ends
 
