@@ -47,7 +47,7 @@ class VehicleModelForm(forms.ModelForm):
 
         widgets = {
                 'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Mercedes'}),
-                'make': forms.Select(attrs={'class': 'form-select js-select2'}),
+                'make': forms.Select(attrs={'class': 'form-select js-select2', 'id':'vehicleMakeSelect2'}),
             } 
 
 #---------------------------------- Vehicle forms -----------------------------------------------

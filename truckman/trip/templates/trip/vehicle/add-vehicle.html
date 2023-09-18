@@ -265,7 +265,7 @@
     </div><!-- .modal-dialog -->
 </div><!-- .modal -->
 
-<!-- Add Vehicle Model modal-->
+<!-- Add Vehicle Model modal--> 
 <div class="modal fade" tabindex="-1" role="dialog" id="addVehicleModel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -338,6 +338,17 @@
 
                         // Clear the form fields
                         $('#addVehicleMakeForm')[0].reset();
+
+                        // Update the "make" dropdown in the "Add Vehicle Model" modal
+                        var makeSelect = $('#vehicleMakeSelect2');
+                        var newOption = $('<option>', {
+                            value: response.make.id,
+                            text: response.make.name,
+                            selected: true // Set the option as selected
+                        });
+
+                    // Append the new option to the select and select it
+                    makeSelect.append(newOption).val(response.make.id);
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {
