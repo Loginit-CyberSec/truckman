@@ -43,9 +43,24 @@ class Preference(models.Model):
 
 class Role(models.Model):
     company = models.ForeignKey(Client, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=50)
     permissions = models.ManyToManyField(Permission, blank=True)
     description = models.TextField(null=True, blank=True)
+
+    def delete(self, *args, **kwargs):
+        # Prevent deletion of the default role
+        if '-admin' in self.name:
+            return
+        super().delete(*args, **kwargs) 
+
+    def save(self, *args, **kwargs):
+        # Check if the instance is being edited and the name contains '-admin'
+        if self.id is not None and '-admin' in self.name:
+            # Fetch the original instance from the database
+            original_instance = Role.objects.get(id=self.id)
+            # Update the name with the original name
+            self.name = original_instance.name
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

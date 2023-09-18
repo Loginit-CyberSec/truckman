@@ -23,7 +23,7 @@ urlpatterns = [
     #role urls
     path('add_role', views.add_role, name='add_role'),
     path('list_roles', views.list_roles, name='list_roles'), 
-    path('view_role/<str:pk>', views.view_role, name='view_role'), 
+    #path('view_role/<str:pk>', views.view_role, name='view_role'), 
     path('update_role/<str:pk>', views.update_role, name='update_role'), 
     path('remove_role/<str:pk>', views.remove_role, name='remove_role'), 
 

@@ -224,7 +224,44 @@ def add_role(request):
 @login_required(login_url='login')
 @permission_required('authentication.change_role')
 def update_role(request, pk):
-    pass
+    role = Role.objects.get(id=pk)
+    if request.method == 'POST':
+        company = get_user_company(request)
+
+        #extract form data
+        role.name = request.POST.get('name')
+        role.description = request.POST.get('description')
+        role.save()
+        selected_permissions = request.POST.getlist('permissions')
+
+        # Set the selected permissions
+        role.permissions.set(selected_permissions) 
+
+        #get role permissions
+        permissions = role.permissions.all() 
+
+        #get all users with this role
+        users = CustomUser.objects.filter(company=company, role=role)
+
+        #update all users with the updated role permissions
+        for user in users:
+            user.user_permissions.set(permissions)
+            user.save()
+ 
+        messages.success(request, 'Role updated successfully')
+        return redirect('list_roles')
+
+    form_data = {
+            'name':role.name,
+            'description': role.description,
+        }
+    
+    form = RoleForm(initial=form_data)
+    context = {
+        'form':form,
+        'role':role,
+    }
+    return render(request, 'authentication/role/update-role.html', context)
 
 # role list view
 @login_required(login_url='login')
@@ -239,17 +276,25 @@ def list_roles(request):
     }
     return render(request, 'authentication/role/roles-list.html', context)
 
-#  view role
-@login_required(login_url='login')
-@permission_required('authentication.view_role')
-def view_role(request, pk):
-    pass
 
 #  remove role
 @login_required(login_url='login')
 @permission_required('authentication.delete_role')
 def remove_role(request, pk):
-    pass
+    company = get_user_company(request) 
+    role = Role.objects.get(id=pk, company=company)    
+    if request.method == 'POST':
+        if '-admin' in role.name:
+            messages.error(request, "Cannot delete the default role.")
+            return redirect('list_roles')
+        else:
+            role.delete()
+            messages.success(request, 'Role deleted successfully!')
+            return redirect('list_roles') 
+
+    #context = {'role': role}
+    #return render(request, 'authentication/role/roles-list.html', context)
+    return redirect('list_roles')
 
 #----------------- Staff Views ---------------------------
 #add staff view
