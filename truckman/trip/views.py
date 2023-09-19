@@ -1206,8 +1206,10 @@ def send_to_shipper(request, pk):
 def docs_bulky_action(request, pk):
     company=get_user_company(request)
     if request.method == 'POST':
+        print('Its a post request')
         # Retrieve the selected option from the form data
         bulk_action = request.POST.get('bulk-action')
+        print(f'This is the sellected bulk action{bulk_action}')
         selected_ids = request.POST.getlist('selected_ids')
         selected_docs = []
         trip = Trip.objects.get(id=pk)
