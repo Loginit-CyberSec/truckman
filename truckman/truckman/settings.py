@@ -161,7 +161,7 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'static/media')
 
-#Configure Celery to use Redis as the message broker
+#Configure Celery to use Redis as the message broker form port 6380. 
 CELERY_BROKER_URL = 'redis://localhost:6380/0' 
 CELERY_RESULT_BACKEND = 'redis://localhost:6380/0'
 
